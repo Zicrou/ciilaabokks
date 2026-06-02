@@ -8,6 +8,9 @@ use App\Http\Controllers\Controller;
 use Faker\Provider\ar_EG\Person;
 use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\LoginRequest;
+use Illuminate\Auth\Events\Login;
+
 class AuthController extends Controller
 {
     public function register(Request $request){
@@ -27,39 +30,70 @@ class AuthController extends Controller
     }
 
     public function login(Request $request){
-        $request->validate([
-            'phone_number' => 'required|string',
-            'password' => 'required',
-        ]);
+        // User::factory()->create([
+        //     'name' => 'Abdouaziz',
+        //     'phone_number' => '7700000000',
+        //     'email' => 'ciilaabokk@example.com',
+        //     'password' => Hash::make('password'),
+        // ]);
+        return view('auth.login');
 
-        $user = User::where('phone_number', $request->phone_number)->first();
+        // $request->validate([
+        //     'phone_number' => 'required|string',
+        //     'password' => 'required',
+        // ]);
 
-        if(!$user || !Hash::check($request->password, $user->password)){
-            return ['message' => 'The provided credentials are incorrect.'];
-        }
+        // $user = User::where('phone_number', $request->phone_number)->first();
+
+        // if(!$user || !Hash::check($request->password, $user->password)){
+        //     return ['message' => 'The provided credentials are incorrect.'];
+        // }
     
-        $token = $user->createToken($user->name);
+        // $token = $user->createToken($user->name);
         
-        //session(['user_id' => $user->id]); 
+        // //session(['user_id' => $user->id]); 
 
-        $tokenFromRequest = PersonalAccessToken::findToken($token->plainTextToken);
-        //$tokenFromRequest->user;
-        return [
-            'user' => $user, 
-            'token' => $token->plainTextToken,
-            'tokenFromRequest' => $tokenFromRequest,
+        // $tokenFromRequest = PersonalAccessToken::findToken($token->plainTextToken);
+        // //$tokenFromRequest->user;
+        // // return [
+        // //     'user' => $user, 
+        // //     'token' => $token->plainTextToken,
+        // //     'tokenFromRequest' => $tokenFromRequest,
             
-        ];
+        // // ];
     }
 
     public function logout(Request $request){
-        //return "Ok";
-        $request->user()->tokens()->delete();
-        //session()->flush(); // removes all session data
-        return ['message' => 'you are logged out',
-            'loggedOut' => true,
+        Auth::logout();
+        return to_route('auth.login');
+    }
+
+    public function doLogin(LoginRequest $request){
+        
+        $field = filter_var($request->login, FILTER_VALIDATE_EMAIL)
+        ? 'email'
+        : 'phone_number';
+
+        $credentials = [
+            $field => $request->login,
+            'password' => $request->password,
         ];
-        // $tokenString = $request->bearerToken(); // Just the token string, no "Bearer"
-        // $tokenFromRequest = PersonalAccessToken::findToken($tokenString);
+        if(Auth::attempt($credentials)){
+            $request->session()->regenerate();
+            return redirect()->intended(route('ouvriers.index'));
+        }
+
+        return to_route('login')->withErrors([
+            'login' => 'Email ou numéro de téléphone ou mot de passe incorrect.',
+        ]);
+    
+        // $token = $user->createToken($user->name);
+        
+        // session(['user_id' => $user->id]); 
+
+        // return [
+        //     'user' => $user, 
+        //     'token' => $token->plainTextToken,
+        // ];
     }
 }
