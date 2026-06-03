@@ -25,7 +25,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('departements', \App\Http\Controllers\DepartementController::class);
     Route::resource('domaines', \App\Http\Controllers\DomaineController::class);
     Route::resource('metiers', \App\Http\Controllers\MetierController::class);
-
+    Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class);
 });
 
 require __DIR__.'/auth.php';
