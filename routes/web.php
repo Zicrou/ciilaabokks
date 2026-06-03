@@ -27,6 +27,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('metiers', \App\Http\Controllers\MetierController::class);
     Route::get('ouvriers/rechercher', [\App\Http\Controllers\OuvrierController::class, 'rechercher'])->name('ouvriers.rechercher');
     Route::get('ouvriers/filtered', [\App\Http\Controllers\OuvrierController::class, 'filtered'])->name('ouvriers.filtered');
+    Route::get('mon_compte', [\App\Http\Controllers\OuvrierController::class,'get_mon_compte'])->name('ouvriers.mon_compte');
     Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class);
 });
 

@@ -74,6 +74,7 @@ class OuvrierController extends Controller
     $region = $request->get('region_id');
     $departement = $request->get('departement_id');
     $metier = $request->get('metier_id');
+    $telephone = $request->get('phone_number');
     $query = \App\Models\Ouvrier::query();
     if ($domaine) {
         $query->where('domain_id', $domaine);
@@ -87,6 +88,9 @@ class OuvrierController extends Controller
     }
     if ($departement) {
         $query->where('departement_id', $departement);
+    }
+    if ($telephone) {
+        $query->where('phone_number', $telephone);
     }
     $ouvriers = $query->with(['metier.domain', 'region', 'departement', 'country'])
     ->get();
@@ -118,10 +122,11 @@ class OuvrierController extends Controller
             'photo_cni' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
             'numero_cni' => ['nullable', 'string', 'max:255'],
             'annees_experience' => ['numeric', 'max:255'],
-            'entreprises' => ['nullable', 'string', 'max:255']
+            'entreprises' => ['nullable', 'string', 'max:255'],
+            'user_id' => ['uuid','nullable'],
         ]);
 
-        \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises'));
+        \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
 
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
     }
@@ -172,15 +177,38 @@ class OuvrierController extends Controller
             'photo_cni' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
             'numero_cni' => ['nullable', 'string', 'max:255'],
             'annees_experience' => ['numeric', 'max:255'],
-            'entreprises' => ['nullable', 'string', 'max:255']
+            'entreprises' => ['nullable', 'string', 'max:255'],
+            'user_id' => ['uuid','nullable'],
         ]);
 
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
-        $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises'));
+        $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'));
 
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
     }
 
+
+    public function get_mon_compte(Request $request)
+    {
+        $ouvrier = $request->validate(
+        [
+            'telephone' => 'required|exists:ouvrier,phone_number',
+        ],
+
+        [
+            'telephone.required' => 'Le numéro de téléphone est obligatoire.',
+
+            'telephone.exists' => 'Ce numéro de téléphone n\'existe pas.',
+        ]
+
+);
+        // $ouvrier = \App\Models\Ouvrier::where('phone_number', $request->telephone)->orWhere('phone_number_2')->first();
+        
+        if($request->telephone){
+            return $this->show($ouvrier['telephone']);
+        }
+        return view('dashboard', ['message' => "Ce numero est invalide"]);
+    }
     /**
      * Remove the specified resource from storage.
      */

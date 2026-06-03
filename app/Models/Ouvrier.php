@@ -13,7 +13,7 @@ class Ouvrier extends Model
     protected $table = 'ouvrier';
 
 
-    protected $fillable = ['name', 'date_of_birth', 'country_id', 'region_id', 'departement_id', 'domain_id', 'metier_id', 'photo', 'phone_number', 'email', 'address', 'phone_number_2', 'photo_cni', 'numero_cni', 'annees_experience', 'entreprises'];
+    protected $fillable = ['name', 'date_of_birth', 'country_id', 'region_id', 'departement_id', 'domain_id', 'metier_id', 'photo', 'phone_number', 'email', 'address', 'phone_number_2', 'photo_cni', 'numero_cni', 'annees_experience', 'entreprises', 'user_id'];
 
     public function country()
     {
