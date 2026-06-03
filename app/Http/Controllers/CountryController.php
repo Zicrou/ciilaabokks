@@ -11,7 +11,7 @@ class CountryController extends Controller
      */
     public function index()
     {
-        return view('ouvriers.country.index', [
+        return view('ouvriers.countries.index', [
             'countries' => \App\Models\Country::all()
         ]);
     }
@@ -21,7 +21,7 @@ class CountryController extends Controller
      */
     public function create()
     {
-        return view('ouvriers.country.create');
+        return view('ouvriers.countries.create');
     }
 
     /**
@@ -52,7 +52,7 @@ class CountryController extends Controller
     public function edit(string $id)
     {
         $country = \App\Models\Country::findOrFail($id);
-        return view('ouvriers.country.edit', compact('country'));
+        return view('ouvriers.countries.edit', compact('country'));
     }
 
     /**
