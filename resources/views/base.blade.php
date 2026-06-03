@@ -46,24 +46,16 @@
             {{-- Login And Registration button --}}
             <li class="nav-item">
                 @auth
-                    <span class="bg-info btn mx-2 px-4 link-underline-info text-white fs-6 nav-link">{{ \Illuminate\Support\Facades\Auth::user()->name }}</span>  
+                    <a href="{{ route("dashboard")}}" class="bg-info btn mx-2 px-4 link-underline-info text-white fs-6 nav-link">{{ \Illuminate\Support\Facades\Auth::user()->name }}</a>  
                 @endauth
                 @guest
-                    <a href="{{ route("auth.login")}}" @class(["nav-link", "bg-info btn","mx-2 px-4","link-underline-info", "text-white", "fs-5", "active" => str_contains($route, 'login.')]) aria-current="page">Se connecter</a>
+                    <a href="{{ route("login")}}" @class(["nav-link", "bg-info btn","mx-2 px-4","link-underline-info", "text-white", "fs-5", "active" => str_contains($route, 'login.')]) aria-current="page">Se connecter</a>
                 @endguest
             </li> 
-            @auth
-                <li class="nav-item">
-                    <form action="{{ route("auth.logout")}}" method="post">
-                        @csrf
-                        @method("delete")
-                        <button type="submit" class="bg-danger btn mx-2 px-4 link-underline-danger text-white fs-6">Se déconnecter</button>
-                    </form>
-                </li>
-                @endauth
+            
             <li class="nav-item">
                 @guest
-                    <a href="{{ route("auth.register")}}" @class(["nav-link", "btn","mx-2 px-4", "text-white", "fs-5", "active" => str_contains($route, 'login.')]) aria-current="page">S'inscrire</a>
+                    <a href="{{ route("register")}}" @class(["nav-link", "btn","mx-2 px-4", "text-white", "fs-5", "active" => str_contains($route, 'login.')]) aria-current="page">S'inscrire</a>
                 @endguest
             </li> 
           </ul>
