@@ -3,6 +3,9 @@
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
+$idRegex = '[0-9]+';
+$nameRegex = '[a-zA-Z]+';
+
 Route::get('/', function () {
     return view('welcome');
 });
@@ -20,7 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('countries', \App\Http\Controllers\CountryController::class);
     Route::resource('regions', \App\Http\Controllers\RegionController::class);
     Route::resource('departements', \App\Http\Controllers\DepartementController::class);
-    // Route::resource('domains', \App\Http\Controllers\DomainController::class);
+    Route::resource('domaines', \App\Http\Controllers\DomaineController::class);
     // Route::resource('metiers', \App\Http\Controllers\MetierController::class);
 
 });
