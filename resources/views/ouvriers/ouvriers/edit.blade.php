@@ -50,6 +50,14 @@
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label for="annees_experience" class="form-label">Année experience</label>
+                    <input type="numeric" name="annees_experience" id="annees_experience" class="form-control" value="{{ $ouvrier->annees_experience }}">
+                </div>
+                <div class="mb-3">
+                    <label for="entreprises" class="form-label">Entreprise</label>
+                    <input type="text" name="entreprises" id="entreprises" class="form-control" value="{{ $ouvrier->entreprises }}">
+                </div>
+                <div class="mb-3">
                     <label for="date_of_birth" class="form-label">Date de naissance</label>
                     <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" value="{{ $ouvrier->date_of_birth }}" required>
                 </div>
@@ -102,5 +110,10 @@
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>
         </div>
+    </div>
+    <div class="mt-4">
+        <a href="{{ route('ouvriers.index') }}" class="btn btn-secondary">
+            Retour
+        </a>
     </div>
 @endsection
