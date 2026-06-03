@@ -135,3 +135,65 @@
         @endif
     @endforeach
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+    document.getElementById('domaine_id').addEventListener('change', function () {
+
+    const domaineId = this.value;
+
+    fetch(`/api/metiers?domaine_id=${domaineId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            let metierSelect = document.getElementById('metier_id');
+
+            metierSelect.innerHTML =
+                '<option value="">Sélectionnez un métier</option>';
+
+            data.forEach(metier => {
+
+                metierSelect.innerHTML += `
+                    <option value="${metier.id}">
+                        ${metier.name}
+                    </option>
+                `;
+            });
+        });
+});
+
+});
+
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+
+document.getElementById('region_id').addEventListener('change', function () {
+
+    const regionId = this.value;
+    
+    fetch(`/api/departements?region_id=${regionId}`)
+        .then(response => response.json())
+        .then(data => {
+
+            
+            let departementSelect =
+                document.getElementById('departement_id');
+
+            departementSelect.innerHTML =
+                '<option value="">Sélectionnez un département</option>';
+
+            data.forEach(departement => {
+                departementSelect.innerHTML += `
+                    <option value="${departement.id}">
+                        ${departement.name}
+                    </option>
+                `;
+            });
+        });
+});
+});
+
+</script>

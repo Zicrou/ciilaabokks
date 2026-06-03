@@ -28,6 +28,8 @@ Route::middleware('auth')->group(function () {
     Route::get('ouvriers/rechercher', [\App\Http\Controllers\OuvrierController::class, 'rechercher'])->name('ouvriers.rechercher');
     Route::get('ouvriers/filtered', [\App\Http\Controllers\OuvrierController::class, 'filtered'])->name('ouvriers.filtered');
     Route::get('mon_compte', [\App\Http\Controllers\OuvrierController::class,'get_mon_compte'])->name('ouvriers.mon_compte');
+    Route::get('/api/metiers', [\App\Http\Controllers\OuvrierController::class, 'metiersByDomaine']);
+    Route::get('/api/departements', [\App\Http\Controllers\OuvrierController::class, 'departementsByRegion']);
     Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class);
 });
 

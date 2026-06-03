@@ -38,17 +38,20 @@ class OuvrierController extends Controller
         ]);
     }
 
-    public function filtered()
+    public function metiersByDomaine(Request $request)
     {
-        if (request()->has('regionId')) {
-            $departements = \App\Models\Region::find(request()->get('regionId'))->departements;
-            return response()->json($departements);
-        } elseif (request()->has('domaineId')) {
-            $metiers = \App\Models\Domaine::find(request()->get('domaineId'))->metiers;
-            return response()->json($metiers);
-        } else {
-            return response()->json([]);
-        }
+        return \App\Models\Metier::where(
+            'domain_id',
+            $request->domaine_id
+        )->get();
+    }
+
+public function departementsByRegion(Request $request)
+    {
+        return \App\Models\Departement::where(
+            'region_id',
+            $request->region_id
+        )->get();
     }
     # @region = params[:regionId]
     # @domaine = params[:domaineId]
@@ -70,27 +73,27 @@ class OuvrierController extends Controller
     
 
   public function rechercher(Request $request){
-    $domaine = $request->get('domaine_id');
-    $region = $request->get('region_id');
-    $departement = $request->get('departement_id');
-    $metier = $request->get('metier_id');
-    $telephone = $request->get('phone_number');
     $query = \App\Models\Ouvrier::query();
-    if ($domaine) {
-        $query->where('domain_id', $domaine);
-    }
 
-    if ($metier) {
-        $query->where('metier_id', $metier);
+    if ($request->filled('domain_id')) {
+        $query->where('domain_id', $$request->domain_id);
     }
-    if ($region) {
-        $query->where('region_id', $region);
+    if ($request->filled('metier_id')) {
+        $query->where('metier_id', $request->metier_id);
     }
-    if ($departement) {
-        $query->where('departement_id', $departement);
+    if ($request->filled('region_id')) {
+        $query->where('region_id', $request->region_id);
     }
-    if ($telephone) {
-        $query->where('phone_number', $telephone);
+    if ($request->filled('departement_id')) {
+        $query->where('departement_id', $request->departement_id);
+    }
+    if ($request->filled('phone_number')) {
+        $query->where(
+            'phone_number',
+            'like',
+            '%' . $request->phone_number . '%'
+        );
+
     }
     $ouvriers = $query->with(['metier.domain', 'region', 'departement', 'country'])
     ->get();
