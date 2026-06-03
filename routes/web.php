@@ -24,7 +24,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('regions', \App\Http\Controllers\RegionController::class);
     Route::resource('departements', \App\Http\Controllers\DepartementController::class);
     Route::resource('domaines', \App\Http\Controllers\DomaineController::class);
-    // Route::resource('metiers', \App\Http\Controllers\MetierController::class);
+    Route::resource('metiers', \App\Http\Controllers\MetierController::class);
 
 });
 

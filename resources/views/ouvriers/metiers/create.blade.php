@@ -1,21 +1,21 @@
 @extends("base")
 
 @section("content")
-    <h1 class="text-center">Ajouter un departement</h1>
+    <h1 class="text-center">Ajouter un metier</h1>
     <div class="card">
         <div class="card-body">
-            <form action="{{ route("departements.store")}}" method="post">
+            <form action="{{ route("metiers.store")}}" method="post">
                 @csrf
                 <div class="mb-3">
-                    <label for="name" class="form-label">Nom du departement</label>
+                    <label for="name" class="form-label">Nom du metier</label>
                     <input type="text" name="name" id="name" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label for="region_id" class="form-label">Region</label>
-                    <select name="region_id" id="region_id" class="form-control" required>
-                        <option value="">Sélectionnez une region</option>
-                        @foreach($regions as $region)
-                            <option value="{{ $region->id }}">{{ $region->name }}</option>
+                    <label for="domain_id" class="form-label">Domaine</label>
+                    <select name="domain_id" id="domain_id" class="form-control" required>
+                        <option value="">Sélectionnez un domaine</option>
+                        @foreach($domaines as $domaine)
+                            <option value="{{ $domaine->id }}">{{ $domaine->name }}</option>
                         @endforeach
                     </select>
                 </div>
