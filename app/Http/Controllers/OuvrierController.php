@@ -40,6 +40,9 @@ class OuvrierController extends Controller
 
     public function metiersByDomaine(Request $request)
     {
+        if ($request->domaine_id == null || $request->domaine_id == ""){
+            return \App\Models\Metier::all();
+        }
         return \App\Models\Metier::where(
             'domain_id',
             $request->domaine_id
@@ -48,6 +51,9 @@ class OuvrierController extends Controller
 
 public function departementsByRegion(Request $request)
     {
+        if($request->region_id == null || $request->region_id == ""){
+            return \App\Models\Departement::all();
+        }
         return \App\Models\Departement::where(
             'region_id',
             $request->region_id

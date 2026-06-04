@@ -139,61 +139,59 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-    document.getElementById('domaine_id').addEventListener('change', function () {
+        document.getElementById('domaine_id').addEventListener('change', function () {
+            const domaineId = this.value;
 
-    const domaineId = this.value;
+            fetch(`/api/metiers?domaine_id=${domaineId}`)
 
-    fetch(`/api/metiers?domaine_id=${domaineId}`)
-        .then(response => response.json())
-        .then(data => {
+            .then(response => response.json())
 
-            let metierSelect = document.getElementById('metier_id');
+            .then(data => {
 
-            metierSelect.innerHTML =
-                '<option value="">Sélectionnez un métier</option>';
+                let metierSelect =
+                document.getElementById('metier_id');
 
-            data.forEach(metier => {
+                metierSelect.innerHTML =
+                    '<option value="">Sélectionnez un métier</option>';
 
-                metierSelect.innerHTML += `
-                    <option value="${metier.id}">
-                        ${metier.name}
-                    </option>
-                `;
+                data.forEach(metier => {
+                    metierSelect.innerHTML += `
+                        <option value="${metier.id}">
+                            ${metier.name}
+                        </option>
+                    `;
+                });
+
             });
         });
-});
-
-});
-
+    });
 </script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-document.getElementById('region_id').addEventListener('change', function () {
+        document.getElementById('region_id').addEventListener('change', function () {
 
-    const regionId = this.value;
-    
-    fetch(`/api/departements?region_id=${regionId}`)
-        .then(response => response.json())
-        .then(data => {
+            const regionId = this.value;
 
-            
-            let departementSelect =
-                document.getElementById('departement_id');
+            fetch(`/api/departements?region_id=${regionId}`)
+            .then(response => response.json())
+            .then(data => {
 
-            departementSelect.innerHTML =
-                '<option value="">Sélectionnez un département</option>';
+                console.log(data);
+                let departementSelect =
+                    document.getElementById('departement_id');
 
-            data.forEach(departement => {
-                departementSelect.innerHTML += `
-                    <option value="${departement.id}">
-                        ${departement.name}
-                    </option>
-                `;
+                departementSelect.innerHTML =
+                    '<option value="">Sélectionnez un département</option>';
+
+                data.forEach(departement => {
+                    departementSelect.innerHTML += `
+                        <option value="${departement.id}">
+                            ${departement.name}
+                        </option>`;
+                });
             });
         });
-});
-});
-
+    });
 </script>
