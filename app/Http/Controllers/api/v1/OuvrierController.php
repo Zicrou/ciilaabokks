@@ -1,42 +1,41 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\api\v1;
 
 use Illuminate\Http\Request;
 
-class OuvrierController extends Controller
+use Laravel\Sanctum\PersonalAccessToken;
+use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use App\Http\Controllers\Controller;
+
+class OuvrierController extends Controller  implements HasMiddleware
 {
-    /**
-     * Display a listing of the resource.
-     */
+    public static function middleware()
+    {
+        return [
+            new Middleware('auth:sanctum'),
+        ];
+    }
+
+    
     public function index()
     {   
         $departements = \App\Models\Departement::all();
         $metiers = \App\Models\Metier::all();
         $regions = \App\Models\Region::all();
         $domaines = \App\Models\Domain::all();
-        return view('ouvriers.ouvriers.index', [
-            'ouvriers' => \App\Models\Ouvrier::with(['metier.domain', 'region', 'departement', 'country'])->get(),
+        $ouvriers = \App\Models\Ouvrier::with(['metier.domain', 'region', 'departement', 'country'])->get();
+        return  [
+            'ouvriers' => $ouvriers,
             'departements' => $departements,
             'metiers' => $metiers,
             'regions' => $regions,
             'domaines' => $domaines
-        ]);
+        ];
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        return view('ouvriers.ouvriers.create', [
-            'countries' => \App\Models\Country::all(),
-            'regions' => \App\Models\Region::with('country')->get(),
-            'departements' => \App\Models\Departement::with('region')->get(),
-            'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all()
-        ]);
-    }
+   
 
     public function metiersByDomaine(Request $request)
     {
@@ -82,7 +81,7 @@ public function departementsByRegion(Request $request)
     $query = \App\Models\Ouvrier::query();
 
     if ($request->filled('domain_id')) {
-        $query->where('domain_id', $$request->domain_id);
+        $query->where('domain_id', $request->domain_id);
     }
     if ($request->filled('metier_id')) {
         $query->where('metier_id', $request->metier_id);
@@ -103,12 +102,12 @@ public function departementsByRegion(Request $request)
     }
     $ouvriers = $query->with(['metier.domain', 'region', 'departement', 'country'])
     ->get();
-    
+    return ['ouvriers' => $ouvriers, 'ouvriersCount' => $ouvriers->count()];
     $metiers = \App\Models\Metier::all();
     $departements = \App\Models\Departement::all();
     $regions = \App\Models\Region::all();
     $domaines = \App\Models\Domain::all();
-    return view('ouvriers.ouvriers.index', ['ouvriers' => $ouvriers, 'departements' => $departements, 'metiers' => $metiers, 'domaines' => $domaines, 'regions' => $regions]);
+    return ['ouvriers' => $ouvriers, 'ouvriersCount' => $ouvriers->count(), 'departements' => $departements, 'metiers' => $metiers, 'domaines' => $domaines, 'regions' => $regions];
 }
 
     /**
@@ -136,9 +135,9 @@ public function departementsByRegion(Request $request)
             'user_id' => ['uuid','nullable'],
         ]);
 
-        \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
+        $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
 
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
+        return $ouvrier;
     }
 
     /**
@@ -147,24 +146,10 @@ public function departementsByRegion(Request $request)
     public function show(\App\Models\Ouvrier $ouvrier)
     {
         $ouvrier->load(['metier.domain', 'region', 'departement', 'country']);
-        return view('ouvriers.ouvriers.show', compact('ouvrier'));
+        return $ouvrier;
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['metier.domain', 'region', 'departement', 'country']);
-        return view('ouvriers.ouvriers.edit', [
-            'ouvrier' => $ouvrier,
-            'countries' => \App\Models\Country::all(),
-            'regions' => \App\Models\Region::with('country')->get(),
-            'departements' => \App\Models\Departement::with('region')->get(),
-            'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all()
-        ]);
-    }
+   
 
     /**
      * Update the specified resource in storage.
@@ -192,9 +177,11 @@ public function departementsByRegion(Request $request)
         ]);
 
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
-        $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'));
-
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
+        
+        if(!$ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'))){
+            return ["message" => "Erreur update"];
+            }
+        return ["ouvrier" => $ouvrier, "status" => 200];
     }
 
 
@@ -217,7 +204,7 @@ public function departementsByRegion(Request $request)
         if($request->telephone){
             return $this->show($ouvrier['telephone']);
         }
-        return view('dashboard', ['message' => "Ce numero est invalide"]);
+        return ['message' => "Ce numero est invalide"];
     }
     /**
      * Remove the specified resource from storage.
@@ -227,6 +214,6 @@ public function departementsByRegion(Request $request)
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
         $ouvrier->delete();
 
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier deleted successfully.');
+        return ['message' => 'Ouvrier deleted successfully.'];
     }
 }

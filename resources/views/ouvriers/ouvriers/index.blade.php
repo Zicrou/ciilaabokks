@@ -1,7 +1,7 @@
 @extends("base")
 
 @section("content")
-<div class="container">
+<div class="container mb-5">
 
   <h1>Rechercher d'ouvriers</h1>
 
@@ -18,7 +18,6 @@
                             @foreach($departements as $departement)
                                 <option value="{{ $departement->id }}" {{ request('departement_id') == $departement->id ? 'selected' : '' }}>{{ $departement->name }}</option>
                             @endforeach
-                            onchange="getIdDepartement()"
                         </select>
                     </div>
                 </div>
@@ -31,7 +30,6 @@
                         @foreach($regions as $region)
                             <option value="{{ $region->id }}" {{ request('region_id') == $region->id ? 'selected' : '' }}>{{ $region->name }}</option>
                         @endforeach
-                        onchange="getIdRegion()"
                     </select>
                 </div>
             </div>
@@ -44,7 +42,6 @@
                         @foreach($domaines as $domaine)
                             <option value="{{ $domaine->id }}" {{ request('domaine_id') == $domaine->id ? 'selected' : '' }}>{{ $domaine->name }}</option>
                         @endforeach
-                        onchange="getIDDomaine()"
                     </select>
                 </div>
             
@@ -55,7 +52,6 @@
                         @foreach($metiers as $metier)
                             <option value="{{ $metier->id }}" {{ request('metier_id') == $metier->id ? 'selected' : '' }}>{{ $metier->name }}</option>
                         @endforeach
-                        onchange="getIdMetier()"
                     </select>
                 </div>
             </div>
@@ -63,7 +59,7 @@
                 <div class="form-group col-lg-4">
                     <div class="">
                         <label for="phone_number" class="form-label">Telephone</label>
-                        <input type="text" name="phone_number" id="phone_number" class="form-control" value="{{ request('phone_number') }}"  required>
+                        <input type="text" name="phone_number" id="phone_number" class="form-control" value="{{ request('phone_number') }}" >
                     </div>
                 </div>
             </div>
@@ -83,15 +79,16 @@
 
     <span class="h1 text-center">Ouvriers</span> <a href="{{ route("ouvriers.create") }}" class="h1 btn btn-primary">Ajouter</a>
 
-    @foreach($ouvriers as $ouvrier)
-        @if($ouvriers->isEmpty())
-            <div class="card text-center mt-5">
+    @if($ouvriers->isEmpty())
+            <div class="card text-center mt-5 mb-5">
                 <div class="card-body">
                     <p class="text-center">Aucun ouvrier trouvé.</p>
                 </div>
             </div>
-        @else
-            <div class="card text-center mt-5">
+    @endif
+    @foreach($ouvriers as $ouvrier)
+        
+            <div class="card text-center mt-5 mb-5">
                 <div class="card-header">
                     <h2 class="card-title">{{  $ouvrier->metier->domain->name . " / " . $ouvrier->metier->name}}</h2>
                 </div>
@@ -131,7 +128,6 @@
                     </div>
                 </div>
             </div>
-        @endif
     @endforeach
 
     <script>
