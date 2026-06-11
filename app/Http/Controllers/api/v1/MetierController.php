@@ -20,9 +20,9 @@ class MetierController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('ouvriers.metiers.index', [
+        return [
             'metiers' => \App\Models\Metier::with('domain')->get()
-        ]);
+        ];
     }
 
     /**

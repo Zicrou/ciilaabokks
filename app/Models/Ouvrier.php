@@ -39,4 +39,9 @@ class Ouvrier extends Model
     {
         return $this->belongsTo(Metier::class);
     }
+
+    public function portfolio()
+    {
+        return $this->hasMany(Portfolio::class);
+    }
 }

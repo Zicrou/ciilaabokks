@@ -4,7 +4,7 @@
     <h1 class="text-center">Modifier un ouvrier</h1>
     <div class="card">
         <div class="card-body">
-            <form action="{{ route("ouvriers.update", $ouvrier->id) }}" method="post">
+            <form action="{{ route("ouvriers.update", $ouvrier->id) }}" method="post" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
                 <div class="mb-3">
@@ -106,6 +106,11 @@
                             </option>
                         @endforeach
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label for="images" class="form-label">Portfolio</label>
+                    <input type="file" name="images[]" id="images" class="form-control" value="{{ old('images') }}" accept="image/png, image/jpeg, image/jpg, image/webp" multiple
+                        accept="image/*">
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>

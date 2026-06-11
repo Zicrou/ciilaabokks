@@ -25,8 +25,8 @@ Route::prefix('v1')->group(function () {
         Route::get('ouvriers/rechercher', [\App\Http\Controllers\api\v1\OuvrierController::class, 'rechercher'])->name('ouvriers.rechercher');
         Route::get('ouvriers/filtered', [\App\Http\Controllers\api\v1\OuvrierController::class, 'filtered'])->name('ouvriers.filtered');
         Route::get('mon_compte', [\App\Http\Controllers\api\v1\OuvrierController::class,'get_mon_compte'])->name('ouvriers.mon_compte');
-        Route::get('/api/metiers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'metiersByDomaine']);
-        Route::get('/api/departements', [\App\Http\Controllers\api\v1\OuvrierController::class, 'departementsByRegion']);
+        Route::get('/filtered/metiers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'metiersByDomaine']);
+        Route::get('/filtered/departements', [\App\Http\Controllers\api\v1\OuvrierController::class, 'departementsByRegion']);
         Route::resource('ouvriers', \App\Http\Controllers\api\v1\OuvrierController::class);
     });
 

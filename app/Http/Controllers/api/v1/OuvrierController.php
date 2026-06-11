@@ -8,6 +8,8 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use App\Models\Portfolio;
+use PhpParser\Node\Stmt\Foreach_;
 
 class OuvrierController extends Controller  implements HasMiddleware
 {
@@ -25,13 +27,13 @@ class OuvrierController extends Controller  implements HasMiddleware
         $metiers = \App\Models\Metier::all();
         $regions = \App\Models\Region::all();
         $domaines = \App\Models\Domain::all();
-        $ouvriers = \App\Models\Ouvrier::with(['metier.domain', 'region', 'departement', 'country'])->get();
+        $ouvriers = \App\Models\Ouvrier::with(['portfolio','metier.domain', 'region', 'departement', 'country'])->get();
         return  [
             'ouvriers' => $ouvriers,
             'departements' => $departements,
             'metiers' => $metiers,
             'regions' => $regions,
-            'domaines' => $domaines
+            'domaines' => $domaines,
         ];
     }
 
@@ -133,10 +135,28 @@ public function departementsByRegion(Request $request)
             'annees_experience' => ['numeric', 'max:255'],
             'entreprises' => ['nullable', 'string', 'max:255'],
             'user_id' => ['uuid','nullable'],
+            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
         ]);
 
-        $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
+        $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id', 'portfolios'));
+        $uploadedImages = [];
 
+        foreach ($request->file('images') as $image) {
+
+            $path = $image->store('portfolios', 'public');
+
+            $uploadedImages[] = $path;
+
+        }
+        if($uploadedImages != null){
+            
+            forEach($uploadedImages as $image){
+                Portfolio::create([
+                    'image' => $image,
+                    'ouvrier_id' => $ouvrier->id,
+                ]);
+            }
+        }
         return $ouvrier;
     }
 
@@ -174,13 +194,23 @@ public function departementsByRegion(Request $request)
             'annees_experience' => ['numeric', 'max:255'],
             'entreprises' => ['nullable', 'string', 'max:255'],
             'user_id' => ['uuid','nullable'],
+            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
         ]);
 
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
         
         if(!$ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'))){
             return ["message" => "Erreur update"];
+        }
+        if($request->images != null){
+            $images = $request->images;
+            forEach($images as $image){
+                Portfolio::create([
+                    'image' => $image,
+                    'ouvrier_id' => $ouvrier->id,
+                ]);
             }
+        }
         return ["ouvrier" => $ouvrier, "status" => 200];
     }
 
@@ -212,6 +242,7 @@ public function departementsByRegion(Request $request)
     public function destroy(string $id)
     {
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
+
         $ouvrier->delete();
 
         return ['message' => 'Ouvrier deleted successfully.'];

@@ -47,6 +47,20 @@
             </div>
         </div>
     </div>
+    <br>
+    <div class="card">
+        <div class="card-header">
+            <h3 class="text-center">Portfolio de l'ouvrier</h3>
+        </div>
+
+        <div class="card-body">
+            <div class="row d-flex justify-content-center">
+                @foreach ($ouvrier->portfolio as $portfolio)
+                    <img class="d-block mb-5" style="height:300px;width:450px" src="{{ asset('storage/' . $portfolio->image) }}" alt="">
+                @endforeach
+            </div>
+        </div>
+    </div>
     <div class="mt-4">
 
         <a href="{{ route('ouvriers.index') }}" class="btn btn-secondary">

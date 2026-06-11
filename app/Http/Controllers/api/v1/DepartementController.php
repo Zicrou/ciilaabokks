@@ -21,9 +21,9 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('ouvriers.departements.index', [
+        return [
             'departements' => \App\Models\Departement::with('region', 'region.country')->get()
-        ]);
+        ];
     }
 
     /**
@@ -31,9 +31,9 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        return view('ouvriers.departements.create', [
-            'regions' => \App\Models\Region::with('country')->get()
-        ]);
+        // return view('ouvriers.departements.create', [
+        //     'regions' => \App\Models\Region::with('country')->get()
+        // ]);
     }
 
     /**
@@ -48,7 +48,7 @@ class DepartementController extends Controller implements HasMiddleware
 
         \App\Models\Departement::create($request->only('name', 'region_id'));
 
-        return redirect()->route('departements.index')->with('success', 'Departement created successfully.');
+        return ['message', 'Departement created successfully.'];
     }
 
     /**
@@ -65,7 +65,7 @@ class DepartementController extends Controller implements HasMiddleware
     public function edit(string $id)
     {
         $departement = \App\Models\Departement::findOrFail($id)->load('region', 'region.country');
-        return view('ouvriers.departements.edit', ['departement' => $departement, 'regions' => \App\Models\Region::with('country')->get()]);
+        return ['departement' => $departement, 'regions' => \App\Models\Region::with('country')->get()];
     }
 
     /**
@@ -81,7 +81,7 @@ class DepartementController extends Controller implements HasMiddleware
         $departement = \App\Models\Departement::findOrFail($id);
         $departement->update($request->only('name', 'region_id'));
 
-        return redirect()->route('departements.index')->with('success', 'Departement updated successfully.');
+        return['message', 'Departement updated successfully.'];
     }
 
     /**
@@ -92,6 +92,6 @@ class DepartementController extends Controller implements HasMiddleware
         $departement = \App\Models\Departement::findOrFail($id);
         $departement->delete();
 
-        return redirect()->route('departements.index')->with('success', 'Departement deleted successfully.');
+        return ['message', 'Departement deleted successfully.'];
     }
 }

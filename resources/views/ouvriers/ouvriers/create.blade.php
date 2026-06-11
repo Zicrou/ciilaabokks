@@ -4,7 +4,7 @@
     <h1 class="text-center">Ajouter un ouvrier</h1>
     <div class="card">
         <div class="card-body">
-            <form action="{{ route("ouvriers.store")}}" method="post">
+            <form action="{{ route("ouvriers.store")}}" method="post" enctype="multipart/form-data">
                 @csrf
                 
                 <div class="mb-3">
@@ -99,6 +99,11 @@
                             <option value="{{ $departement->id }}">{{ $departement->name }}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="mb-3">
+                    <label for="images" class="form-label">Portfolio</label>
+                    <input type="file" name="images[]" id="images" class="form-control" value="{{ old('images') }}" accept="image/png, image/jpeg, image/jpg, image/webp" multiple
+                        accept="image/*">
                 </div>
                 <button type="submit" class="btn btn-primary">Enregistrer</button>
             </form>

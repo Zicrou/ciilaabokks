@@ -134,10 +134,28 @@ public function departementsByRegion(Request $request)
             'annees_experience' => ['numeric', 'max:255'],
             'entreprises' => ['nullable', 'string', 'max:255'],
             'user_id' => ['uuid','nullable'],
+            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
         ]);
 
-        \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
+        $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
+        $uploadedImages = [];
 
+        foreach ($request->file('images') as $image) {
+
+            $path = $image->store('portfolios', 'public');
+
+            $uploadedImages[] = $path;
+
+        }
+        if($uploadedImages != null){
+            
+            forEach($uploadedImages as $image){
+                \App\Models\Portfolio::create([
+                    'image' => $image,
+                    'ouvrier_id' => $ouvrier->id,
+                ]);
+            }
+        }
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
     }
 
@@ -146,7 +164,7 @@ public function departementsByRegion(Request $request)
      */
     public function show(\App\Models\Ouvrier $ouvrier)
     {
-        $ouvrier->load(['metier.domain', 'region', 'departement', 'country']);
+        $ouvrier->load(['metier.domain', 'region', 'departement', 'country', 'portfolio']);
         return view('ouvriers.ouvriers.show', compact('ouvrier'));
     }
 
@@ -155,7 +173,7 @@ public function departementsByRegion(Request $request)
      */
     public function edit(string $id)
     {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['metier.domain', 'region', 'departement', 'country']);
+        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['metier.domain', 'region', 'departement', 'country', 'portfolio']);
         return view('ouvriers.ouvriers.edit', [
             'ouvrier' => $ouvrier,
             'countries' => \App\Models\Country::all(),
@@ -189,11 +207,29 @@ public function departementsByRegion(Request $request)
             'annees_experience' => ['numeric', 'max:255'],
             'entreprises' => ['nullable', 'string', 'max:255'],
             'user_id' => ['uuid','nullable'],
+            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
         ]);
 
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
         $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'));
+        $uploadedImages = [];
 
+        foreach ($request->file('images') as $image) {
+
+            $path = $image->store('portfolios', 'public');
+
+            $uploadedImages[] = $path;
+
+        }
+        if($uploadedImages != null){
+            
+            forEach($uploadedImages as $image){
+                \App\Models\Portfolio::create([
+                    'image' => $image,
+                    'ouvrier_id' => $ouvrier->id,
+                ]);
+            }
+        }
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
     }
 
