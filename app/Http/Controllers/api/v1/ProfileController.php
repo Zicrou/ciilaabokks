@@ -22,14 +22,18 @@ class ProfileController extends Controller implements HasMiddleware
             new Middleware('auth:sanctum'),
         ];
     }
+
+    public function index(Request $request){
+        return ['user' => $request->user()];
+    }
     /**
      * Display the user's profile form.
      */
-    public function edit(Request $request): View
+    public function edit(Request $request)
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
+        return [
+            // 'user' => $request->user(),
+        ];
     }
 
     /**
@@ -44,13 +48,13 @@ class ProfileController extends Controller implements HasMiddleware
 
         $request->user()->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return ['status', 'profile-updated'];
     }
 
     /**
      * Delete the user's account.
      */
-    public function destroy(Request $request): RedirectResponse
+    public function destroy(Request $request)
     {
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
@@ -65,6 +69,6 @@ class ProfileController extends Controller implements HasMiddleware
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return Redirect::to('/');
+        return ['message' => "Profile deleted"];
     }
 }

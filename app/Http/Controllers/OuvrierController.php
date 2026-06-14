@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\OuvrierFormRequest;
 use Illuminate\Http\Request;
 
 class OuvrierController extends Controller
@@ -34,7 +35,8 @@ class OuvrierController extends Controller
             'regions' => \App\Models\Region::with('country')->get(),
             'departements' => \App\Models\Departement::with('region')->get(),
             'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all()
+            'domains' => \App\Models\Domain::all(),
+            'diplomes' => \App\Models\Diplome::pluck('name', 'id')
         ]);
     }
 
@@ -134,10 +136,15 @@ public function departementsByRegion(Request $request)
             'annees_experience' => ['numeric', 'max:255'],
             'entreprises' => ['nullable', 'string', 'max:255'],
             'user_id' => ['uuid','nullable'],
-            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
+            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048'],
+            'diplome' => ['boolean'],
+            'diplomes' => ['array', 'exists:diplomes,id'],
+            // 'autres_diplomes' => ['nullable', 'string'],
         ]);
 
         $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
+        $ouvrier->diplomes()->sync($request->validated('diplomes'));
+        
         $uploadedImages = [];
 
         foreach ($request->file('images') as $image) {
@@ -156,6 +163,10 @@ public function departementsByRegion(Request $request)
                 ]);
             }
         }
+
+        // $diplomeOuvrier = '';
+        // if('')
+
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
     }
 
@@ -174,47 +185,33 @@ public function departementsByRegion(Request $request)
     public function edit(string $id)
     {
         $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['metier.domain', 'region', 'departement', 'country', 'portfolio']);
+        $selectedDiplomes = $ouvrier->diplomes->pluck('id');
         return view('ouvriers.ouvriers.edit', [
             'ouvrier' => $ouvrier,
             'countries' => \App\Models\Country::all(),
             'regions' => \App\Models\Region::with('country')->get(),
             'departements' => \App\Models\Departement::with('region')->get(),
             'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all()
+            'domains' => \App\Models\Domain::all(),
+            'diplomes' => \App\Models\Diplome::pluck('name', 'id'),
+            'selectedDiplomes' => $selectedDiplomes,
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(OuvrierFormRequest $request, string $id)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
-            'region_id' => 'required|exists:region,id',
-            'departement_id' => 'required|exists:departement,id',
-            'metier_id' => 'required|exists:metier,id',
-            'domain_id' => 'required|exists:domain,id',
-            'date_of_birth' => 'required|date',
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
-            'phone_number' => ['required', 'string', 'max:255', 'unique:ouvrier,phone_number,' . $id],
-            'email' => ['nullable', 'email', 'max:255'],
-            'address' => ['required', 'string', 'max:255'],
-            'phone_number_2' => ['nullable', 'string', 'max:255'],
-            'photo_cni' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
-            'numero_cni' => ['nullable', 'string', 'max:255'],
-            'annees_experience' => ['numeric', 'max:255'],
-            'entreprises' => ['nullable', 'string', 'max:255'],
-            'user_id' => ['uuid','nullable'],
-            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
-        ]);
-
+        $dataOuvrier = $request->validated();
+        // dd($dataOuvrier);
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
+        $ouvrier->diplomes()->sync($dataOuvrier['diplomes']);
         $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'));
         $uploadedImages = [];
 
-        foreach ($request->file('images') as $image) {
+        if($request->hasFile('images')){
+            foreach ($request->file('images') as $image) {
 
             $path = $image->store('portfolios', 'public');
 
@@ -230,6 +227,8 @@ public function departementsByRegion(Request $request)
                 ]);
             }
         }
+        }
+        
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
     }
 

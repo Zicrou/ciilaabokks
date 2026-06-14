@@ -30,9 +30,9 @@ class MetierController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        return view('ouvriers.metiers.create', [
+        return [
             'domaines' => \App\Models\Domain::all()
-        ]);
+        ];
     }
 
     /**
@@ -47,7 +47,7 @@ class MetierController extends Controller implements HasMiddleware
 
         \App\Models\Metier::create($request->only('name', 'domain_id'));
 
-        return redirect()->route('metiers.index')->with('success', 'Metier created successfully.');
+        return ['message', 'Metier created successfully.'];
     }
 
     /**
@@ -64,7 +64,7 @@ class MetierController extends Controller implements HasMiddleware
     public function edit(string $id)
     {
         $metier = \App\Models\Metier::findOrFail($id)->load('domain');
-        return view('ouvriers.metiers.edit', ['metier' => $metier, 'domaines' => \App\Models\Domain::all()]);
+        return ['metier' => $metier, 'domaines' => \App\Models\Domain::all()];
     }
 
     /**
@@ -80,7 +80,7 @@ class MetierController extends Controller implements HasMiddleware
         $metier = \App\Models\Metier::findOrFail($id);
         $metier->update($request->only('name', 'domain_id'));
 
-        return redirect()->route('metiers.index')->with('success', 'Metier updated successfully.');
+        return ['success', 'Metier updated successfully.'];
     }
 
     /**
@@ -91,6 +91,6 @@ class MetierController extends Controller implements HasMiddleware
         $metier = \App\Models\Metier::findOrFail($id);
         $metier->delete();
 
-        return redirect()->route('metiers.index')->with('success', 'Metier deleted successfully.');
+        return ['success', 'Metier deleted successfully.'];
     }
 }

@@ -31,6 +31,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/metiers', [\App\Http\Controllers\OuvrierController::class, 'metiersByDomaine']);
     Route::get('/api/departements', [\App\Http\Controllers\OuvrierController::class, 'departementsByRegion']);
     Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class);
+    Route::resource('diplomes', \App\Http\Controllers\DiplomeController::class);
+
 });
 
 require __DIR__.'/auth.php';

@@ -1,28 +1,20 @@
 <?php
 
-namespace App\Http\Controllers\api\v1;
+namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Laravel\Sanctum\PersonalAccessToken;
-use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Routing\Controllers\HasMiddleware;
-use App\Http\Controllers\Controller;
-class DomaineController extends Controller implements HasMiddleware
+
+
+class DiplomeController extends Controller 
 {
-    public static function middleware()
-    {
-        return [
-            new Middleware('auth:sanctum'),
-        ];
-    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return [
-            'domaines' => \App\Models\Domain::all()
-        ];
+        return view('ouvriers.diplomes.index', [
+            'diplomes' => \App\Models\Diplome::all(),
+        ]);
     }
 
     /**
@@ -30,7 +22,7 @@ class DomaineController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        return;
+        return view('ouvriers.diplomes.create');
     }
 
     /**
@@ -42,9 +34,9 @@ class DomaineController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        \App\Models\Domain::create($request->only('name'));
+        \App\Models\Diplome::create($request->only('name'));
 
-        return ['message' => 'Domaine created successfully.'];
+        return redirect()->route('diplomes.index')->with('success', 'Diplome created successfully.');
     }
 
     /**
@@ -60,8 +52,8 @@ class DomaineController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $domaines = \App\Models\Domain::findOrFail($id);
-        return ['domaines' => $domaines];
+        $diplome = \App\Models\Diplome::findOrFail($id);
+        return view('ouvriers.diplomes.edit', compact('diplome'));
     }
 
     /**
@@ -73,10 +65,10 @@ class DomaineController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        $domaine = \App\Models\Domain::findOrFail($id);
-        $domaine->update($request->only('name'));
+        $diplome = \App\Models\Diplome::findOrFail($id);
+        $diplome->update($request->only('name'));
 
-        return ['success', 'Domaine updated successfully.'];
+        return redirect()->route('diplomes.index')->with('success', 'Diplome updated successfully.');
     }
 
     /**
@@ -84,9 +76,9 @@ class DomaineController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $domaine = \App\Models\Domain::findOrFail($id);
-        $domaine->delete();
+        $diplome = \App\Models\Diplome::findOrFail($id);
+        $diplome->delete();
 
-    return ['success', 'Domaine deleted successfully.'];
+        return redirect()->route('diplomes.index')->with('success', 'Diplome deleted successfully.');
     }
 }

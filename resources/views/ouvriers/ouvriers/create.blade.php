@@ -101,6 +101,15 @@
                     </select>
                 </div>
                 <div class="mb-3">
+                    <label for="Diplômes" class="form-label">Diplômes</label>
+                    <select name="diplomes[]" id="diplomes" class="form-control"  required multiple>
+                        <option value="">Sélectionnez un diplômes</option>
+                        @foreach($diplomes as $k=>$v)
+                            <option value="{{ $k }}">{{ $v }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="mb-3">
                     <label for="images" class="form-label">Portfolio</label>
                     <input type="file" name="images[]" id="images" class="form-control" value="{{ old('images') }}" accept="image/png, image/jpeg, image/jpg, image/webp" multiple
                         accept="image/*">

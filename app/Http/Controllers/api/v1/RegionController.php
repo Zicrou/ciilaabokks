@@ -23,9 +23,9 @@ class RegionController extends Controller implements HasMiddleware
      */
     public function index()
     {
-        return view('ouvriers.regions.index', [
+        return  [
             'regions' => \App\Models\Region::with('country')->get()
-        ]);
+        ];
     }
 
     /**
@@ -33,9 +33,9 @@ class RegionController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        return view('ouvriers.regions.create', [
+        return  [
             'countries' => \App\Models\Country::all()
-        ]);
+        ];
     }
 
     /**
@@ -50,7 +50,7 @@ class RegionController extends Controller implements HasMiddleware
 
         Region::create($request->only('name', 'country_id'));
 
-        return redirect()->route('regions.index')->with('success', 'Region created successfully.');
+        return ['message', 'Region created successfully.'];
     }
 
     /**
@@ -67,7 +67,7 @@ class RegionController extends Controller implements HasMiddleware
     public function edit(string $id)
     {
         $region = Region::findOrFail($id)->load('country');
-        return view('ouvriers.regions.edit', ['region' => $region, 'countries' => Country::all()]);
+        return ['region' => $region, 'countries' => Country::all()];
     }
 
     /**
@@ -83,7 +83,7 @@ class RegionController extends Controller implements HasMiddleware
         $region = Region::findOrFail($id);
         $region->update($request->only('name', 'country_id'));
 
-        return redirect()->route('regions.index')->with('success', 'Region updated successfully.');
+        return ['success', 'Region updated successfully.'];
     }
 
     /**
@@ -94,6 +94,6 @@ class RegionController extends Controller implements HasMiddleware
         $region = Region::findOrFail($id);
         $region->delete();
 
-        return redirect()->route('regions.index')->with('success', 'Region deleted successfully.');
+        return ['success', 'Region deleted successfully.'];
     }
 }

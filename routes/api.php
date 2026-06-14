@@ -28,6 +28,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/filtered/metiers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'metiersByDomaine']);
         Route::get('/filtered/departements', [\App\Http\Controllers\api\v1\OuvrierController::class, 'departementsByRegion']);
         Route::resource('ouvriers', \App\Http\Controllers\api\v1\OuvrierController::class);
+        Route::resource('diplomes', \App\Http\Controllers\api\v1\DiplomeController::class);
     });
 
     Route::middleware('auth:sanctum')->group(function () {

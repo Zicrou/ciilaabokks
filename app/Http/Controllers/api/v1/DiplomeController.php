@@ -7,8 +7,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
-
-class DepartementController extends Controller implements HasMiddleware
+class DiplomeController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
@@ -22,7 +21,7 @@ class DepartementController extends Controller implements HasMiddleware
     public function index()
     {
         return [
-            'departements' => \App\Models\Departement::with('region', 'region.country')->get()
+            'diplomes' => \App\Models\Diplome::all()
         ];
     }
 
@@ -31,9 +30,7 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function create()
     {
-        // return view('ouvriers.departements.create', [
-        //     'regions' => \App\Models\Region::with('country')->get()
-        // ]);
+        return;
     }
 
     /**
@@ -43,12 +40,11 @@ class DepartementController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
         ]);
 
-        \App\Models\Departement::create($request->only('name', 'region_id'));
+        \App\Models\Diplome::create($request->only('name'));
 
-        return ['message' => 'Departement created successfully.'];
+        return ['message' => 'Diplome created successfully.'];
     }
 
     /**
@@ -56,7 +52,7 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function show(string $id)
     {
-        //
+        
     }
 
     /**
@@ -64,8 +60,8 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $departement = \App\Models\Departement::findOrFail($id)->load('region', 'region.country');
-        return ['departement' => $departement, 'regions' => \App\Models\Region::with('country')->get()];
+        $diplomes = \App\Models\Diplome::findOrFail($id);
+        return ['diplomes' => $diplomes];
     }
 
     /**
@@ -75,13 +71,12 @@ class DepartementController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
         ]);
 
-        $departement = \App\Models\Departement::findOrFail($id);
-        $departement->update($request->only('name', 'region_id'));
+        $diplomes = \App\Models\Diplome::findOrFail($id);
+        $diplomes->update($request->only('name'));
 
-        return['message' => 'Departement updated successfully.'];
+        return ['success', 'Diplome updated successfully.'];
     }
 
     /**
@@ -89,9 +84,9 @@ class DepartementController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $departement = \App\Models\Departement::findOrFail($id);
-        $departement->delete();
+        $diplomes = \App\Models\Diplome::findOrFail($id);
+        $diplomes->delete();
 
-        return ['message' => 'Departement deleted successfully.'];
+    return ['success', 'Diplome deleted successfully.'];
     }
 }
