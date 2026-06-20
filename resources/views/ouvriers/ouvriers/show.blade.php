@@ -5,19 +5,15 @@
     <div class="card">
         <div class="card-header">
             <div class="d-flex justify-content-center">
-
-                        @if($ouvrier->photo)
-                            <img
-                                src="{{ asset('storage/' . $ouvrier->photo) }}"
-                                alt="Photo"
-                                class=""
-                                style="width: 25rem; height: 15rem; object-fit: cover; margin: -8px; margin-left: -16px;"
-                            >
-                        @endif
-
-                       
-
-                    </div>
+                @if($ouvrier->photo)
+                    <img
+                        src="{{ asset('storage/' . $ouvrier->photo) }}"
+                        alt="Photo"
+                        class=""
+                        style="width: 25rem; height: 15rem; object-fit: cover; margin: -8px; margin-left: -16px;"
+                    >
+                @endif
+            </div>
         </div>
 
         <div class="card-body">
@@ -52,7 +48,7 @@
                     @endforeach
                     
                     
-                    <p><strong>Année expérience :</strong> {{ $ouvrier->annee_experience }}</p>
+                    <p><strong>Année expérience :</strong> {{ $ouvrier->annees_experience }}</p>
                     <p><strong>Entreprises :</strong> 
                         @foreach ($ouvrier->entreprises as $entreprise)
                             {{ $entreprise->name}}
@@ -78,10 +74,8 @@
     </div>
     <div class="mt-4">
 
-        <a href="{{ route('ouvriers.index') }}" class="btn btn-secondary">
-
+        <a href="{{ url()->previous()  }}" class="btn btn-secondary">
             Retour
-
         </a>
 
         <a href="{{ route('ouvriers.edit', $ouvrier) }}" class="btn btn-warning">

@@ -103,7 +103,7 @@
                         @endif
 
                         <div class="flex-grow-1 text-center">
-                            <h4 class="mb-1"><a href="{{ route("ouvrier.show", $ouvrier) }}" class="text-capitalized text-black col-3 col-sm-3 col-lg-3">{{ $ouvrier->name }}</a></h4>
+                            <h4 class="mb-1"><a href="{{ route("ouvrier.show", $ouvrier->id) }}" class="text-capitalized text-black col-3 col-sm-3 col-lg-3">{{ $ouvrier->name }}</a></h4>
 
                             <p class="mb-0">
                                 Téléphone 1 : {{ $ouvrier->phone_number }}
@@ -147,7 +147,7 @@
                         <div class="col-7 d-flex justify-content-evenly text-center mx-auto gap-2" style="padding: 0">
                             @auth
                                 <a href="{{ route("ouvriers.edit", $ouvrier) }}" class=" btn btn-sm btn-outline-primary col-3 col-sm-3 col-lg-3">Edit</a>
-                                <a href="{{ route("ouvriers.show", $ouvrier) }}" class=" btn btn-sm btn-outline-info col-3 col-sm-3 col-lg-3">Show</a>
+                                <a href="{{ route("ouvrier.show", $ouvrier->id) }}" class=" btn btn-sm btn-outline-info col-3 col-sm-3 col-lg-3">Show</a>
                                 <form action="{{ route("ouvriers.destroy", $ouvrier) }}" method="post" style="display: inline; margin-left: -20px;" class="col-3 col-sm-3 col-lg-3">
                                     @csrf
                                     @method('DELETE')

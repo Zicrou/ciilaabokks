@@ -167,16 +167,16 @@ public function departementsByRegion(Request $request)
             }
         }
         
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
+        return redirect()->route('ouvriers.liste')->with('success', 'Ouvrier created successfully.');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(\App\Models\Ouvrier $ouvrier)
+    public function show($id)
     {
-        $ouvrier->load(['metiers.domaine', 'region', 'departement', 'country', 'portfolios']);
-        
+        $ouvrier = \App\Models\Ouvrier::find($id)->load(['metiers.domaine', 'region', 'departement', 'country', 'portfolios']);
+        // dd($ouvrier);        
         
         return view('ouvriers.ouvriers.show', compact('ouvrier'));
     }
@@ -257,7 +257,7 @@ public function departementsByRegion(Request $request)
         }
         
         
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
+        return redirect()->route('ouvrier.show', $ouvrier->id)->with('success', 'Ouvrier updated successfully.');
     }
 
 
@@ -265,7 +265,7 @@ public function departementsByRegion(Request $request)
     {
         $ouvrier = $request->validate(
         [
-            'telephone' => 'required', 'exists:ouvriers,phone_number',
+            'telephone' => 'required', 'string',
         ],
 
         [
@@ -275,10 +275,9 @@ public function departementsByRegion(Request $request)
         ]
 
 );
-        // $ouvrier = \App\Models\Ouvrier::where('phone_number', $request->telephone)->orWhere('phone_number_2')->first();
-        
+        $ouvrier = \App\Models\Ouvrier::where('phone_number', $request->telephone)->orWhere('phone_number_2', $request->telephone)->first();
         if($request->telephone){
-            return $this->show($ouvrier['telephone']);
+            return $this->show($ouvrier->id);
         }
         return view('dashboard', ['message' => "Ce numero est invalide"]);
     }
@@ -290,6 +289,6 @@ public function departementsByRegion(Request $request)
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
         $ouvrier->delete();
 
-        return redirect()->route('ouvriers.index')->with('success', 'Ouvrier deleted successfully.');
+        return redirect()->route('ouvriers.liste')->with('success', 'Ouvrier deleted successfully.');
     }
 }

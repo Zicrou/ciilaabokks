@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Route;
 $idRegex = '[0-9]+';
 $nameRegex = '[a-zA-Z]+';
 
-Route::get('/', function () {
-    return view('welcome');
-});
+Route::get('/', [\App\Http\Controllers\OuvrierController::class, 'index'])->name('ouvriers.liste');
 
 Route::get('/dashboard', function () {
     return view('dashboard');
@@ -34,8 +32,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('diplomes', \App\Http\Controllers\DiplomeController::class);
 
 });
-    Route::get('ouvriers', [\App\Http\Controllers\OuvrierController::class, 'index']);
-    Route::get('ouvriers/{ouvrier}', [\App\Http\Controllers\OuvrierController::class, 'show'])->name("ouvrier.show");
+    Route::get('ouvriers', [\App\Http\Controllers\OuvrierController::class, 'index'])->name('ouvriers.liste');
+    Route::get('ouvriers/{id}', [\App\Http\Controllers\OuvrierController::class, 'show'])->name("ouvrier.show");
 
 
 require __DIR__.'/auth.php';
