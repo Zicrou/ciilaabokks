@@ -12,7 +12,7 @@ class DepartementController extends Controller
     public function index()
     {
         return view('ouvriers.departements.index', [
-            'departements' => \App\Models\Departement::with('region', 'region.country')->get()
+            'departements' => \App\Models\Departement::with('region')->get()
         ]);
     }
 
@@ -22,7 +22,7 @@ class DepartementController extends Controller
     public function create()
     {
         return view('ouvriers.departements.create', [
-            'regions' => \App\Models\Region::with('country')->get()
+            'regions' => \App\Models\Region::pluck('name', 'id'),
         ]);
     }
 
@@ -32,8 +32,8 @@ class DepartementController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
+            'name' => ['required', 'string', 'max:255'],
+            'region_id' => ['uuid', 'required', 'exists:regions,id'],
         ]);
 
         \App\Models\Departement::create($request->only('name', 'region_id'));
@@ -54,8 +54,8 @@ class DepartementController extends Controller
      */
     public function edit(string $id)
     {
-        $departement = \App\Models\Departement::findOrFail($id)->load('region', 'region.country');
-        return view('ouvriers.departements.edit', ['departement' => $departement, 'regions' => \App\Models\Region::with('country')->get()]);
+        $departement = \App\Models\Departement::findOrFail($id);
+        return view('ouvriers.departements.edit', ['departement' => $departement, 'regions' => \App\Models\Region::all()]);
     }
 
     /**
@@ -64,8 +64,8 @@ class DepartementController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
+            'name' => ['required','string','max:255'],
+            'region_id' => ['uuid', 'required','exists:regions,id'],
         ]);
 
         $departement = \App\Models\Departement::findOrFail($id);

@@ -11,14 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('portfolios', function (Blueprint $table) {
-           $table->uuid('id')->primary();
+        Schema::create('diplome_ouvrier', function (Blueprint $table) {
             $table->uuid('ouvrier_id');
             $table->foreign('ouvrier_id')
                 ->references('id')
                 ->on('ouvriers')
                 ->onDelete('cascade');
-            $table->string('image');
+            $table->uuid('diplome_id');
+            $table->foreign('diplome_id')
+                ->references('id')
+                ->on('diplomes')
+                ->onDelete('cascade');
+                
+            $table->primary(['ouvrier_id', 'diplome_id']);
             $table->timestamps();
         });
     }
@@ -28,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('portfolios');
+        Schema::dropIfExists('diplome_ouvrier');
     }
 };

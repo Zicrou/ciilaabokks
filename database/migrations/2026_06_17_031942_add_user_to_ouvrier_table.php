@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ouvrier', function (Blueprint $table) {
-            $table->integer('annees_experience')->nullable();
-            $table->string("entreprises")->nullable();
+        Schema::table('ouvriers', function (Blueprint $table) {
+            $table->addColumn('uuid', 'user_id')->nullable();
         });
     }
 
@@ -22,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ouvrier', function (Blueprint $table) {
-            $table->dropColumn(['annees_experience', 'entreprises']);
+        Schema::table('ouvriers', function (Blueprint $table) {
+            $table->dropColumn('user_id');
         });
     }
 };

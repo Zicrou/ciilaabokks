@@ -30,9 +30,12 @@ Route::middleware('auth')->group(function () {
     Route::get('mon_compte', [\App\Http\Controllers\OuvrierController::class,'get_mon_compte'])->name('ouvriers.mon_compte');
     Route::get('/api/metiers', [\App\Http\Controllers\OuvrierController::class, 'metiersByDomaine']);
     Route::get('/api/departements', [\App\Http\Controllers\OuvrierController::class, 'departementsByRegion']);
-    Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class);
+    Route::resource('ouvriers', \App\Http\Controllers\OuvrierController::class)->except(['index', 'show']);
     Route::resource('diplomes', \App\Http\Controllers\DiplomeController::class);
 
 });
+    Route::get('ouvriers', [\App\Http\Controllers\OuvrierController::class, 'index']);
+    Route::get('ouvriers/{ouvrier}', [\App\Http\Controllers\OuvrierController::class, 'show'])->name("ouvrier.show");
+
 
 require __DIR__.'/auth.php';

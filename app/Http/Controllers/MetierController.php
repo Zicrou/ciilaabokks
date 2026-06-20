@@ -12,7 +12,7 @@ class MetierController extends Controller
     public function index()
     {
         return view('ouvriers.metiers.index', [
-            'metiers' => \App\Models\Metier::with('domain')->get()
+            'metiers' => \App\Models\Metier::with('domaine')->get()
         ]);
     }
 
@@ -22,7 +22,7 @@ class MetierController extends Controller
     public function create()
     {
         return view('ouvriers.metiers.create', [
-            'domaines' => \App\Models\Domain::all()
+            'domaines' => \App\Models\Domaine::all()
         ]);
     }
 
@@ -32,11 +32,11 @@ class MetierController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'domain_id' => 'required|exists:domain,id',
+            'name' => ['required', 'string', 'max:255'],
+            'domaine_id' => ['uuid', 'required', 'exists:domaines,id'],
         ]);
 
-        \App\Models\Metier::create($request->only('name', 'domain_id'));
+        \App\Models\Metier::create($request->only('name', 'domaine_id'));
 
         return redirect()->route('metiers.index')->with('success', 'Metier created successfully.');
     }
@@ -54,8 +54,8 @@ class MetierController extends Controller
      */
     public function edit(string $id)
     {
-        $metier = \App\Models\Metier::findOrFail($id)->load('domain');
-        return view('ouvriers.metiers.edit', ['metier' => $metier, 'domaines' => \App\Models\Domain::all()]);
+        $metier = \App\Models\Metier::findOrFail($id)->load('domaine');
+        return view('ouvriers.metiers.edit', ['metier' => $metier, 'domaines' => \App\Models\Domaine::all()]);
     }
 
     /**
@@ -64,12 +64,12 @@ class MetierController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'domain_id' => 'required|exists:domain,id',
+            'name' => ['required', 'string', 'max:255'],
+            'domaine_id' => ['uuid', 'required', 'exists:domaines,id'],
         ]);
 
         $metier = \App\Models\Metier::findOrFail($id);
-        $metier->update($request->only('name', 'domain_id'));
+        $metier->update($request->only('name', 'domaine_id'));
 
         return redirect()->route('metiers.index')->with('success', 'Metier updated successfully.');
     }

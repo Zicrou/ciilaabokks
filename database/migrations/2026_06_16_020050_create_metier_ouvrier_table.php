@@ -11,20 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('diplome_ouvrier', function (Blueprint $table) {
-        //    $table->id('id')->primary();
-            $table->uuid('ouvrier_id')->nullable();
+        Schema::create('metier_ouvrier', function (Blueprint $table) {
+            $table->uuid('ouvrier_id');
             $table->foreign('ouvrier_id')
                 ->references('id')
-                ->on('ouvrier')
+                ->on('ouvriers')
                 ->onDelete('cascade');
-            $table->uuid('diplome_id');
-            $table->foreign('diplome_id')
+            $table->uuid('metier_id');
+            $table->foreign('metier_id')
                 ->references('id')
-                ->on('diplomes')
+                ->on('metiers')
                 ->onDelete('cascade');
                 
-                $table->primary(['ouvrier_id', 'diplome_id']);
+                $table->primary(['ouvrier_id', 'metier_id']);
                 $table->timestamps();
         });
     }
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('diplome_ouvrier');
+        Schema::dropIfExists('metier_ouvrier');
     }
 };

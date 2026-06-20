@@ -12,8 +12,8 @@
                     <input type="text" name="name" id="name" class="form-control" value="{{ $metier->name }}" required>
                 </div>
                 <div class="mb-3">
-                    <label for="domain_id" class="form-label">Domaine</label>
-                    <select name="domain_id" id="domain_id" class="form-control" required>
+                    <label for="domaine_id" class="form-label">Domaine</label>
+                    <select name="domaine_id" id="domaine_id" class="form-control" required>
                         @foreach($domaines as $domaine)
                             <option value="{{ $domaine->id }}" {{ $metier->domaine_id == $domaine->id ? 'selected' : '' }}>{{ $domaine->name }}</option>
                         @endforeach

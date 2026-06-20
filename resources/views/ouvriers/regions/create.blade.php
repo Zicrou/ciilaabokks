@@ -14,8 +14,8 @@
                     <label for="country_id" class="form-label">Pays</label>
                     <select name="country_id" id="country_id" class="form-control" required>
                         <option value="">Sélectionnez un pays</option>
-                        @foreach($countries as $country)
-                            <option value="{{ $country->id }}">{{ $country->name }}</option>
+                        @foreach($countries as $k => $v)
+                            <option value="{{ $k }}">{{ $v}}</option>
                         @endforeach
                     </select>
                 </div>

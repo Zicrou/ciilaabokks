@@ -10,14 +10,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Ouvrier extends Model
 {
     use HasFactory, HasUuid; 
-    protected $table = 'ouvrier';
+    protected $table = 'ouvriers';
 
 
-    protected $fillable = ['name', 'date_of_birth', 'country_id', 'region_id', 'departement_id', 'domain_id', 'metier_id', 'photo', 'phone_number', 'email', 'address', 'phone_number_2', 'photo_cni', 'numero_cni', 'annees_experience', 'entreprises', 'user_id','diplomes'];
+    protected $fillable = ['name', 'date_of_birth', 'country_id', 'region_id', 'departement_id', 'photo', 'phone_number', 'email', 'address', 'phone_number_2', 'photo_cni', 'numero_cni', 'annees_experience', 'user_id'];
 
     public function country()
     {
-        return $this->belongsTo(Country::class);
+        return $this->belongsTo(Countries::class);
     }
 
     public function region()
@@ -30,17 +30,17 @@ class Ouvrier extends Model
         return $this->belongsTo(Departement::class);
     }
 
-    public function domain()
+    public function domaines()
     {
-        return $this->belongsTo(Domain::class);
+        return $this->belongsToMany(Domaine::class );
     }
 
-    public function metier()
+    public function metiers()
     {
-        return $this->belongsTo(Metier::class);
+        return $this->belongsToMany(Metier::class );
     }
 
-    public function portfolio()
+    public function portfolios()
     {
         return $this->hasMany(Portfolio::class);
     }
@@ -48,5 +48,10 @@ class Ouvrier extends Model
     public function diplomes()
     {
         return $this->belongsToMany(Diplome::class);
+    }
+
+    public function entrepriseS()
+    {
+        return $this->belongsToMany(Entreprise::class);
     }
 }

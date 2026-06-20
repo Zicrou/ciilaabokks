@@ -12,8 +12,9 @@ class RegionController extends Controller
      */
     public function index()
     {
+        // dd(Region::with('country')->get());
         return view('ouvriers.regions.index', [
-            'regions' => \App\Models\Region::with('country')->get()
+            'regions' => Region::with('country')->get()
         ]);
     }
 
@@ -23,7 +24,7 @@ class RegionController extends Controller
     public function create()
     {
         return view('ouvriers.regions.create', [
-            'countries' => \App\Models\Country::all()
+            'countries' => \App\Models\Countries::pluck('name', 'id')
         ]);
     }
 
@@ -33,8 +34,8 @@ class RegionController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
+            'name' => ['required', 'string', 'max:255'],
+            'country_id' => ['uuid','required', 'exists:countries,id'],
         ]);
 
         Region::create($request->only('name', 'country_id'));
@@ -55,8 +56,8 @@ class RegionController extends Controller
      */
     public function edit(string $id)
     {
-        $region = Region::findOrFail($id)->load('country');
-        return view('ouvriers.regions.edit', ['region' => $region, 'countries' => Country::all()]);
+        $region = Region::findOrFail($id);
+        return view('ouvriers.regions.edit', ['region' => $region, 'countries' => \App\Models\Countries::all()]);
     }
 
     /**
@@ -65,8 +66,8 @@ class RegionController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
+            'name' => ['required', 'string', 'max:255'],            
+            'country_id' => ['uuid','required', 'exists:countries,id'],
         ]);
 
         $region = Region::findOrFail($id);

@@ -2,16 +2,25 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasUuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Metier extends Model
 {
-    protected $table = 'metier';
+    use HasFactory, HasUuid;
+    protected $table = 'metiers';
 
-    protected $fillable = ['name', 'domain_id'];
+    protected $fillable = ['name', 'domaine_id'];
 
-    public function domain()
+    public function domaine()
     {
-        return $this->belongsTo(Domain::class);
+        return $this->belongsTo(Domaine::class);
+    }
+
+    public function ouvriers()
+    {
+        return $this->belongsToMany(Ouvrier::class );
     }
 }

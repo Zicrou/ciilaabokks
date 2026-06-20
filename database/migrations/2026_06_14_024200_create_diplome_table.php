@@ -13,12 +13,8 @@ return new class extends Migration
     {
         Schema::create('diplomes', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->nullable(false);
-            // $table->uuid('ouvrier_id');
-            // $table->foreign('ouvrier_id')
-            //     ->references('id')
-            //     ->on('ouvrier')
-            //     ->onDelete('cascade');
+            $table->string('name');
+            
             $table->timestamps();
         });
     }

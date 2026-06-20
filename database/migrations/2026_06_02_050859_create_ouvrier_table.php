@@ -11,17 +11,25 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ouvrier', function (Blueprint $table) {
+        Schema::create('ouvriers', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->foreignId('metier_id')->references('id')
-                ->on('metier')->onDelete('cascade');
-            $table->foreignId('region_id')->references('id')
-                ->on('region')->onDelete('cascade');
-            $table->foreignId('country_id')->references('id')
-                ->on('country')->onDelete('cascade');
-            $table->foreignId('domain_id')->references('id')
-                ->on('domain')->onDelete('cascade');
+            
+            $table->uuid('region_id');
+            $table->foreign('region_id')
+                ->references('id')
+                ->on('regions')
+                ->onDelete('cascade');
+            $table->uuid('country_id');
+            $table->foreign('country_id')
+                ->references('id')
+                ->on('countries')
+                ->onDelete('cascade');
+            $table->uuid('departement_id');
+            $table->foreign('departement_id')
+                ->references('id')
+                ->on('departements')
+                ->onDelete('cascade');
             $table->string('phone_number')->unique();
             $table->string('email')->unique()->nullable();
             $table->string('address')->nullable(false);
@@ -30,8 +38,9 @@ return new class extends Migration
             $table->string('photo')->nullable();
             $table->string('photo_cni')->nullable();
             $table->string('numero_cni')->nullable();
-            $table->foreignId('departement_id')->references('id')
-                ->on('departement')->onDelete('cascade');
+            $table->integer('annees_experience')->nullable();
+            $table->string("entreprises")->nullable();
+            // $table->uuid('user_id')->nullable();
             $table->timestamps();
         });
     }
@@ -41,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('ouvrier');
+        Schema::dropIfExists('ouvriers');
     }
 };

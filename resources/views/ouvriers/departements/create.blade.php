@@ -14,8 +14,8 @@
                     <label for="region_id" class="form-label">Region</label>
                     <select name="region_id" id="region_id" class="form-control" required>
                         <option value="">Sélectionnez une region</option>
-                        @foreach($regions as $region)
-                            <option value="{{ $region->id }}">{{ $region->name }}</option>
+                        @foreach($regions as $k => $v)
+                            <option value="{{ $k }}">{{ $v}}</option>
                         @endforeach
                     </select>
                 </div>

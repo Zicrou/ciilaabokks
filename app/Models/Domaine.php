@@ -7,12 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Diplome extends Model
+class Domaine extends Model
 {
     use HasFactory, HasUuid;
-    protected $table = 'diplomes';
+    protected $table = 'domaines';
 
     protected $fillable = ['name'];
+    
+    public function metiers()
+    {
+        return $this->hasMany(Metier::class);
+    }
+
     public function ouvrier()
     {
         return $this->belongsToMany(Ouvrier::class );

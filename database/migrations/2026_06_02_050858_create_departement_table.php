@@ -11,11 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('departement', function (Blueprint $table) {
-            $table->id();
+        Schema::create('departements', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->string('name');
-            $table->foreignId('region_id')->references('id')
-                ->on('region')->onDelete('cascade');
+            $table->uuid('region_id');
+            $table->foreign('region_id')
+                ->references('id')
+                ->on('regions')
+                ->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -25,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('departement');
+        Schema::dropIfExists('departements');
     }
 };

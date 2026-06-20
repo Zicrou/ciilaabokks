@@ -12,7 +12,7 @@ class DomaineController extends Controller
     public function index()
     {
         return view('ouvriers.domaines.index', [
-            'domaines' => \App\Models\Domain::all()
+            'domaines' => \App\Models\Domaine::all()
         ]);
     }
 
@@ -30,10 +30,10 @@ class DomaineController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
-        \App\Models\Domain::create($request->only('name'));
+        \App\Models\Domaine::create($request->only('name'));
 
         return redirect()->route('domaines.index')->with('success', 'Domaine created successfully.');
     }
@@ -51,7 +51,7 @@ class DomaineController extends Controller
      */
     public function edit(string $id)
     {
-        $domaine = \App\Models\Domain::findOrFail($id);
+        $domaine = \App\Models\Domaine::findOrFail($id);
         return view('ouvriers.domaines.edit', compact('domaine'));
     }
 
@@ -61,10 +61,9 @@ class DomaineController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
         ]);
-
-        $domaine = \App\Models\Domain::findOrFail($id);
+        $domaine = \App\Models\Domaine::findOrFail($id);
         $domaine->update($request->only('name'));
 
         return redirect()->route('domaines.index')->with('success', 'Domaine updated successfully.');
@@ -75,7 +74,7 @@ class DomaineController extends Controller
      */
     public function destroy(string $id)
     {
-        $domaine = \App\Models\Domain::findOrFail($id);
+        $domaine = \App\Models\Domaine::findOrFail($id);
         $domaine->delete();
 
         return redirect()->route('domaines.index')->with('success', 'Domaine deleted successfully.');

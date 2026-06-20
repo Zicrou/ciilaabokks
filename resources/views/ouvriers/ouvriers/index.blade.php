@@ -9,7 +9,7 @@
   <div class="card mb-5">
         <form action="{{ route("ouvriers.rechercher") }}" method="get" style="display: inline; margin-left: -20px;" class="">
             @csrf
-            <div class="row d-flex justify-content-center">
+            <div class="row d-flex m-3 justify-content-center">
                 <div class="form-group col-lg-4">
                     <div class="mb-3">
                         <label for="departement_id" class="form-label">Département</label>
@@ -23,9 +23,9 @@
                 </div>
 
 
-                <div class="form-group departements col-lg-4" data-departements="<%= @departements.to_json %>">
+                <div class="form-group departements col-lg-4">
                     <label for="region_id" class="form-label">Région</label>
-                    <select name="region_id" id="region_id" class="form-control" >
+                    <select name="region_id" id="region_id" class="form-control">
                         <option value="">Sélectionnez une région</option>
                         @foreach($regions as $region)
                             <option value="{{ $region->id }}" {{ request('region_id') == $region->id ? 'selected' : '' }}>{{ $region->name }}</option>
@@ -34,20 +34,20 @@
                 </div>
             </div>
 
-            <div class="row mt-5 d-flex justify-content-center">
+            <div class="row m-3 d-flex justify-content-center">
                 <div class="form-group col-lg-4">
                     <label for="domaine_id" class="form-label">Domaine</label>
-                    <select name="domaine_id" id="domaine_id" class="form-control" >
+                    <select name="domaine_id" id="domaine_id" class="form-control">
                         <option value="">Sélectionnez un domaine</option>
                         @foreach($domaines as $domaine)
-                            <option value="{{ $domaine->id }}" {{ request('domaine_id') == $domaine->id ? 'selected' : '' }}>{{ $domaine->name }}</option>
+                            <option value="{{ $domaine->id }}">{{ $domaine->name }}</option>
                         @endforeach
                     </select>
                 </div>
             
-                <div class="form-group metiers col-lg-4" data-metiers="<%= @metiers.to_json %>">
+                <div class="form-group metiers col-lg-4" >
                     <label for="metier_id" class="form-label">Métier</label>
-                    <select name="metier_id" id="metier_id" class="form-control" >
+                    <select name="metier_id" id="metier_id" class="form-control">
                         <option value="">Sélectionnez un métier</option>
                         @foreach($metiers as $metier)
                             <option value="{{ $metier->id }}" {{ request('metier_id') == $metier->id ? 'selected' : '' }}>{{ $metier->name }}</option>
@@ -63,16 +63,18 @@
                     </div>
                 </div>
             </div>
-            <div class="row m-3 d-flex justify-content-center">
-                <div class="form-group col-lg-4">
-                    <button type="submit" class="form-control btn btn-primary">Rechercher</button>
-                </div>
-                <div class="form-group col-lg-4">
-                    <a class="btn btn-secondary col-4" href="{{ route('ouvriers.index') }}"class="form-control btn btn-primary">Réinitialiser</a>
-                </div>
-            </div>
+            <div class="row justify-content-center m-3">
+                <div class="col-md-4 text-center">
+                    <button type="submit" class="btn btn-primary w-100 mb-2">
+                        Rechercher
+                    </button>
 
-            </div>
+                    <a href="{{ route('ouvriers.index') }}"
+                    class="btn btn-secondary w-100">
+                        Réinitialiser
+                    </a>
+                </div>
+            </div>      
         </form>
     </div>
 
@@ -87,42 +89,71 @@
             </div>
     @endif
     @foreach($ouvriers as $ouvrier)
-        
             <div class="card text-center mt-5 mb-5">
                 <div class="card-header">
-                    <h2 class="card-title">{{  $ouvrier->metier->domain->name . " / " . $ouvrier->metier->name}}</h2>
+                    <div class="d-flex align-items-center">
+
+                        @if($ouvrier->photo)
+                            <img
+                                src="{{ asset('storage/' . $ouvrier->photo) }}"
+                                alt="Photo"
+                                class="rounded"
+                                style="width: 100px; height: 100px; object-fit: cover; margin: -8px; margin-left: -16px;"
+                            >
+                        @endif
+
+                        <div class="flex-grow-1 text-center">
+                            <h4 class="mb-1"><a href="{{ route("ouvrier.show", $ouvrier) }}" class="text-capitalized text-black col-3 col-sm-3 col-lg-3">{{ $ouvrier->name }}</a></h4>
+
+                            <p class="mb-0">
+                                Téléphone 1 : {{ $ouvrier->phone_number }}
+                                @if($ouvrier->phone_number_2)
+                                    / Téléphone 2 : {{ $ouvrier->phone_number_2 }}
+                                @endif
+                            </p>
+
+                            <small class="text-muted">
+                                {{ $ouvrier->departement->name }}/{{ $ouvrier->region->name }}
+                                - {{ $ouvrier->address }}
+                            </small>
+                        </div>
+
+                    </div>
                 </div>
                 <div class="card-body">
-                    <div class="row d-flex justify-content-center">
-                        <p class="card-text" style="text-align:center;">{{ $ouvrier->departement->name . '/' . $ouvrier->region->name }}</p>
-                        <div class="col-md-3 me-auto flex-fill" style="">
-                            <p class="card-text" style="text-align:left;"> {{ $ouvrier->name }}</p>
-                            <p class="card-text" style="text-align:left;">Adresse : {{ $ouvrier->address }}</p>
+                    <div class="row d-flex justify-content-around">
+                        <div class="col-4">
+                            <div class=" flex-fill" style="">
+                                @foreach ($ouvrier->metiers as $metier)
+                                    <p class="card-text bold" style="text-align:left;"><strong>{{ $metier->domaine->name . " / " . $metier->name }}</strong></p>
+                                @endforeach
+                            </div>
                         </div>
-                        <div class="col-md-3 flex-fill" style="">
-                            @if($ouvrier->photo)
-                                <img src="{{ asset('storage/' . $ouvrier->photo) }}" alt="Photo" width="70%">
-                            @endif
+
+                        <div class="col-4">
+                            @foreach ($ouvrier->entreprises as $entreprise)
+                                <p class="card-text" style="text-align:center;"><strong>Entreprises: </strong>{{ $entreprise->name }}</p>
+                            @endforeach
                         </div>
-                        <div class="col-md-3 text-start flex-fill" style="">
-                            <p class="card-text" style="">Téléphone 1 : {{ $ouvrier->phone_number }}</p>
-                            <p class="card-text" style="text-align:left;" >Téléphone 2 : {{ $ouvrier->phone_number_2 }}</p>
-                        </div>
+                        
+                        
                     </div>
                 </div>
                 <div class="container card-footer text-body-secondary">
                     <div class="row d-flex text-start flex-fill">
-                        <div class=" col-2 col-sm-2 col-lg-2">
+                        <div class="col-3 col-sm-3 col-lg-3">
                             <span class="">CiiLaaBokK</span>
                         </div>
-                        <div class="col-7 d-flex justify-content-center text-center mx-auto gap-2" style="padding: 0">
-                            <a href="{{ route("ouvriers.edit", $ouvrier) }}" class=" btn btn-sm btn-outline-primary col-2">Edit</a>
-                            <a href="{{ route("ouvriers.show", $ouvrier) }}" class=" btn btn-sm btn-outline-info col-2 mx-2">Show</a>
-                            <form action="{{ route("ouvriers.destroy", $ouvrier) }}" method="post" style="display: inline; margin-left: -20px;" class="col-2">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
-                            </form>
+                        <div class="col-7 d-flex justify-content-evenly text-center mx-auto gap-2" style="padding: 0">
+                            @auth
+                                <a href="{{ route("ouvriers.edit", $ouvrier) }}" class=" btn btn-sm btn-outline-primary col-3 col-sm-3 col-lg-3">Edit</a>
+                                <a href="{{ route("ouvriers.show", $ouvrier) }}" class=" btn btn-sm btn-outline-info col-3 col-sm-3 col-lg-3">Show</a>
+                                <form action="{{ route("ouvriers.destroy", $ouvrier) }}" method="post" style="display: inline; margin-left: -20px;" class="col-3 col-sm-3 col-lg-3">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Are you sure?')">Delete</button>
+                                </form>
+                            @endauth
                         </div>
 
                     </div>

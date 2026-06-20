@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\OuvrierFormRequest;
+use App\Http\Requests\OuvrierUpdateFormRequest;
+use App\Models\Entreprise;
+use App\Models\Ouvrier;
 use Illuminate\Http\Request;
 
 class OuvrierController extends Controller
@@ -15,9 +18,18 @@ class OuvrierController extends Controller
         $departements = \App\Models\Departement::all();
         $metiers = \App\Models\Metier::all();
         $regions = \App\Models\Region::all();
-        $domaines = \App\Models\Domain::all();
+        $domaines = \App\Models\Domaine::all();
+        $ouvriers = \App\Models\Ouvrier::query()
+        ->with([
+        'metiers.domaine',
+        'region',
+        'departement',
+        'country',
+        'entreprises'
+    ])->get();
+    
         return view('ouvriers.ouvriers.index', [
-            'ouvriers' => \App\Models\Ouvrier::with(['metier.domain', 'region', 'departement', 'country'])->get(),
+            'ouvriers' => $ouvriers,
             'departements' => $departements,
             'metiers' => $metiers,
             'regions' => $regions,
@@ -31,11 +43,11 @@ class OuvrierController extends Controller
     public function create()
     {
         return view('ouvriers.ouvriers.create', [
-            'countries' => \App\Models\Country::all(),
+            'countries' => \App\Models\Countries::all(),
             'regions' => \App\Models\Region::with('country')->get(),
-            'departements' => \App\Models\Departement::with('region')->get(),
-            'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all(),
+            'departements' => \App\Models\Departement::all(),
+            'metiers' => \App\Models\Metier::pluck('name', 'id'),
+            'domaines' => \App\Models\Domaine::pluck('name', 'id'),
             'diplomes' => \App\Models\Diplome::pluck('name', 'id')
         ]);
     }
@@ -45,10 +57,7 @@ class OuvrierController extends Controller
         if ($request->domaine_id == null || $request->domaine_id == ""){
             return \App\Models\Metier::all();
         }
-        return \App\Models\Metier::where(
-            'domain_id',
-            $request->domaine_id
-        )->get();
+        return \App\Models\Metier::where('domaine_id',$request->domaine_id)->get();
     }
 
 public function departementsByRegion(Request $request)
@@ -56,117 +65,108 @@ public function departementsByRegion(Request $request)
         if($request->region_id == null || $request->region_id == ""){
             return \App\Models\Departement::all();
         }
-        return \App\Models\Departement::where(
-            'region_id',
-            $request->region_id
-        )->get();
+        return \App\Models\Departement::where('region_id',$request->region_id)->get();
     }
-    # @region = params[:regionId]
-    # @domaine = params[:domaineId]
-    # if !@region.nil?
-    #   @departements = Departement.where(region_id:@region)
-    #   puts "region= "+ @region
-    #   respond_to do |format|
-    #     format.json { render json: @departements }
-    #   end
-
-    # elsif !@domaine.nil?
-    #   @metiers = Metier.where(domaine_id:@domaine)
-    #   puts "domaine= "+ @domaine
-    #   respond_to do |format|
-    #     format.json { render json: @metiers }
-    #   end
-    # end
-    #render :index
     
 
-  public function rechercher(Request $request){
-    $query = \App\Models\Ouvrier::query();
+  public function rechercher(Request $request)
+{
+    $query = Ouvrier::query();
 
-    if ($request->filled('domain_id')) {
-        $query->where('domain_id', $$request->domain_id);
+    if ($request->filled('domaine_id')) {
+        $query->whereHas('domaines', function ($q) use ($request) {
+            $q->where('domaines.id', $request->domaine_id);
+        });
     }
+
     if ($request->filled('metier_id')) {
-        $query->where('metier_id', $request->metier_id);
+        $query->whereHas('metiers', function ($q) use ($request) {
+            $q->where('metiers.id', $request->metier_id);
+        });
     }
+
     if ($request->filled('region_id')) {
         $query->where('region_id', $request->region_id);
     }
+
     if ($request->filled('departement_id')) {
         $query->where('departement_id', $request->departement_id);
     }
+
     if ($request->filled('phone_number')) {
         $query->where(
             'phone_number',
             'like',
             '%' . $request->phone_number . '%'
         );
-
     }
-    $ouvriers = $query->with(['metier.domain', 'region', 'departement', 'country'])
-    ->get();
-    
+
+    $ouvriers = $query->with([
+        'domaines',
+        'metiers.domaine',
+        'region',
+        'departement',
+        'country',
+    ])->get();
     $metiers = \App\Models\Metier::all();
     $departements = \App\Models\Departement::all();
     $regions = \App\Models\Region::all();
-    $domaines = \App\Models\Domain::all();
-    return view('ouvriers.ouvriers.index', ['ouvriers' => $ouvriers, 'departements' => $departements, 'metiers' => $metiers, 'domaines' => $domaines, 'regions' => $regions]);
+    $domaines = \App\Models\Domaine::all();
+
+    return view('ouvriers.ouvriers.index', ['ouvriers' => $ouvriers, 'departements' => $departements, 'metiers' => $metiers, 'regions' => $regions, 'domaines' => $domaines]);
 }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(OuvrierFormRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
-            'region_id' => 'required|exists:region,id',
-            'departement_id' => 'required|exists:departement,id',
-            'metier_id' => 'required|exists:metier,id',
-            'domain_id' => 'required|exists:domain,id',
-            'date_of_birth' => 'required|date',
-            'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
-            'phone_number' => ['required', 'string', 'max:255', 'unique:ouvrier,phone_number'],
-            'email' => ['nullable', 'email', 'max:255'],
-            'address' => ['required', 'string', 'max:255'],
-            'phone_number_2' => ['nullable', 'string', 'max:255'],
-            'photo_cni' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,webp', 'max:2048'], 
-            'numero_cni' => ['nullable', 'string', 'max:255'],
-            'annees_experience' => ['numeric', 'max:255'],
-            'entreprises' => ['nullable', 'string', 'max:255'],
-            'user_id' => ['uuid','nullable'],
-            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048'],
-            'diplome' => ['boolean'],
-            'diplomes' => ['array', 'exists:diplomes,id'],
-            // 'autres_diplomes' => ['nullable', 'string'],
-        ]);
-
-        $ouvrier = \App\Models\Ouvrier::create($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'entreprises', 'user_id'));
-        $ouvrier->diplomes()->sync($request->validated('diplomes'));
-        
+        $data = $request->validated();
         $uploadedImages = [];
+        // $photoProfile = $request->validated('photo');
+        if($request->hasFile('photo')){
+            $image = $request->file('photo');
+            $path = $image->store('ouvrier_profile', 'public');
+            
+            $data['photo'] = $path;
+            // dd($data['photo']);
+        }
+        $ouvrier = \App\Models\Ouvrier::create($data);
+        $ouvrier->diplomes()->sync($request->validated('diplomes'));
+        $ouvrier->metiers()->sync($request->validated('metiers'));
+        $ouvrier->domaines()->sync($request->validated('domaines'));
+        
+        $entrepriseIds = [];
 
-        foreach ($request->file('images') as $image) {
+        foreach ($request->entreprises as $name) {
+
+            $entreprise = Entreprise::firstOrCreate([
+                'name' => $name,
+            ]);
+            $entrepriseIds[] = $entreprise->id;
+        }
+
+        $ouvrier->entreprises()->sync($entrepriseIds);
+
+        if($request->hasFile('images')){
+            foreach ($request->file('images') as $image) {
 
             $path = $image->store('portfolios', 'public');
 
             $uploadedImages[] = $path;
 
-        }
-        if($uploadedImages != null){
-            
-            forEach($uploadedImages as $image){
-                \App\Models\Portfolio::create([
-                    'image' => $image,
-                    'ouvrier_id' => $ouvrier->id,
-                ]);
+            }
+            if($uploadedImages != null){
+                
+                forEach($uploadedImages as $image){
+                    \App\Models\Portfolio::create([
+                        'image' => $image,
+                        'ouvrier_id' => $ouvrier->id,
+                    ]);
+                }
             }
         }
-
-        // $diplomeOuvrier = '';
-        // if('')
-
+        
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier created successfully.');
     }
 
@@ -175,7 +175,9 @@ public function departementsByRegion(Request $request)
      */
     public function show(\App\Models\Ouvrier $ouvrier)
     {
-        $ouvrier->load(['metier.domain', 'region', 'departement', 'country', 'portfolio']);
+        $ouvrier->load(['metiers.domaine', 'region', 'departement', 'country', 'portfolios']);
+        
+        
         return view('ouvriers.ouvriers.show', compact('ouvrier'));
     }
 
@@ -184,30 +186,55 @@ public function departementsByRegion(Request $request)
      */
     public function edit(string $id)
     {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['metier.domain', 'region', 'departement', 'country', 'portfolio']);
+        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['region', 'departement', 'country', 'portfolios']);
         $selectedDiplomes = $ouvrier->diplomes->pluck('id');
+        $selectedmetiers = $ouvrier->metiers->pluck('id');
+        $selectedDomaines = $ouvrier->domaines->pluck('id');
+        $selectedCountry = $ouvrier->country->pluck('id');
+
         return view('ouvriers.ouvriers.edit', [
             'ouvrier' => $ouvrier,
-            'countries' => \App\Models\Country::all(),
-            'regions' => \App\Models\Region::with('country')->get(),
-            'departements' => \App\Models\Departement::with('region')->get(),
-            'metiers' => \App\Models\Metier::with('domain')->get(),
-            'domains' => \App\Models\Domain::all(),
+            'countries' => \App\Models\Countries::pluck('name', 'id'),
+            'regions' => \App\Models\Region::all(),
+            'departements' => \App\Models\Departement::all(),
+            'metiers' => \App\Models\Metier::pluck('name', 'id'),
+            'domaines' => \App\Models\Domaine::pluck('name', 'id'),
             'diplomes' => \App\Models\Diplome::pluck('name', 'id'),
+            // 'entreprises' => \App\Models\Entreprise::pluck('name', 'id'),
             'selectedDiplomes' => $selectedDiplomes,
+            'selectedDomaines' => $selectedDomaines,
+            'selectedMetiers' => $selectedmetiers,
+            'selectedCountry' => $selectedCountry
         ]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(OuvrierFormRequest $request, string $id)
+    public function update(OuvrierUpdateFormRequest $request, string $id)
     {
+        // dd($request->all());
         $dataOuvrier = $request->validated();
-        // dd($dataOuvrier);
         $ouvrier = \App\Models\Ouvrier::findOrFail($id);
         $ouvrier->diplomes()->sync($dataOuvrier['diplomes']);
-        $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'metier_id', 'domain_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience','entreprises', 'user_id'));
+        $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'user_id'));
+        $ouvrier->metiers()->sync($dataOuvrier['metiers']);
+        $ouvrier->domaines()->sync($dataOuvrier['domaines']);
+        $entrepriseIds = [];
+        if($request->entreprises != null){
+            foreach ($request->entreprises as $name) {
+                $entreprise = Entreprise::firstOrCreate([
+                    'name' => $name,
+                ]);
+                $entrepriseIds[] = $entreprise->id;
+            }
+            $ouvrier->entreprises()->sync($entrepriseIds);
+        }
+        if ($request->filled('deleted_entreprises')) {
+            $ids = explode(',', $request->deleted_entreprises);
+            // dd($ids);
+            $ouvrier->entreprises()->detach($ids); // sync($ids);
+        }
         $uploadedImages = [];
 
         if($request->hasFile('images')){
@@ -217,17 +244,18 @@ public function departementsByRegion(Request $request)
 
             $uploadedImages[] = $path;
 
-        }
-        if($uploadedImages != null){
-            
-            forEach($uploadedImages as $image){
-                \App\Models\Portfolio::create([
-                    'image' => $image,
-                    'ouvrier_id' => $ouvrier->id,
-                ]);
+            }
+            if($uploadedImages != null){
+                
+                forEach($uploadedImages as $image){
+                    \App\Models\Portfolio::create([
+                        'image' => $image,
+                        'ouvrier_id' => $ouvrier->id,
+                    ]);
+                }
             }
         }
-        }
+        
         
         return redirect()->route('ouvriers.index')->with('success', 'Ouvrier updated successfully.');
     }
@@ -237,7 +265,7 @@ public function departementsByRegion(Request $request)
     {
         $ouvrier = $request->validate(
         [
-            'telephone' => 'required|exists:ouvrier,phone_number',
+            'telephone' => 'required', 'exists:ouvriers,phone_number',
         ],
 
         [

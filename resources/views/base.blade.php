@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/tom-select@2.6.1/dist/css/tom-select.bootstrap5.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.6.1/dist/js/tom-select.complete.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>@yield('title') | Mon agence Administration</title>
+    <title>@yield('title') | CiiLaaBokk - Ouvrier</title>
 </head>
 <body>
   @php
@@ -17,7 +17,7 @@
   <header>
     <nav class="navbar navbar-expand-lg bg-primary">
       <div class="container">
-        <a class="navbar-brand" href="#">Commerçame</a>
+        <a class="navbar-brand" href="#">CiiLaaBokk</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
@@ -83,8 +83,12 @@
     </div>
 
     <script>
-      new TomSelect('select[multiple]', {plugins: {remove_button: {title: 'supprimer'}}});
-        // new TomSelect('selectProduit');
+      new TomSelect('#diplomes', {plugins: {remove_button: {title: 'supprimer'}}});
+      new TomSelect('#domaines', {plugins: {remove_button: {title: 'supprimer'}}});
+      new TomSelect('#metiers', {plugins: {remove_button: {title: 'supprimer'}}});
+      new TomSelect('#metier_id', {plugins: {remove_button: {title: 'supprimer'}}});
+      new TomSelect('#domaine_id', {plugins: {remove_button: {title: 'supprimer'}}});
+      // new TomSelect('selectProduit');
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>

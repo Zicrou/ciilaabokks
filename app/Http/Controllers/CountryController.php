@@ -12,7 +12,7 @@ class CountryController extends Controller
     public function index()
     {
         return view('ouvriers.countries.index', [
-            'countries' => \App\Models\Country::all()
+            'countries' => \App\Models\Countries::all()
         ]);
     }
 
@@ -33,7 +33,7 @@ class CountryController extends Controller
             'name' => 'required|string|max:255',
         ]);
 
-        \App\Models\Country::create($request->only('name'));
+        \App\Models\Countries::create($request->only('name'));
 
         return redirect()->route('countries.index')->with('success', 'Country created successfully.');
     }
@@ -51,7 +51,7 @@ class CountryController extends Controller
      */
     public function edit(string $id)
     {
-        $country = \App\Models\Country::findOrFail($id);
+        $country = \App\Models\Countries::findOrFail($id);
         return view('ouvriers.countries.edit', compact('country'));
     }
 
@@ -61,10 +61,10 @@ class CountryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
-        $country = \App\Models\Country::findOrFail($id);
+        $country = \App\Models\Countries::findOrFail($id);
         $country->update($request->only('name'));
 
         return redirect()->route('countries.index')->with('success', 'Country updated successfully.');
@@ -75,7 +75,7 @@ class CountryController extends Controller
      */
     public function destroy(string $id)
     {
-        $country = \App\Models\Country::findOrFail($id);
+        $country = \App\Models\Countries::findOrFail($id);
         $country->delete();
 
         return redirect()->route('countries.index')->with('success', 'Country deleted successfully.');

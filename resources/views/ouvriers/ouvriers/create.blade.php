@@ -28,21 +28,21 @@
                     <input type="email" name="email" id="email" class="form-control" value="{{ old('email') }}">
                 </div>
                 <div class="mb-3">
-                    <label for="domain_id" class="form-label">Domaine</label>
-                    <select name="domain_id" id="domain_id" class="form-control"  required>
+                    <label for="domaines" class="form-label">Domaines</label>
+                    <select name="domaines[]" id="domaines" class="form-control" required multiple>
                         <option value="">Sélectionnez un domaine</option>
-                        @foreach($domains as $domain)
-                            <option value="{{ $domain->id }}">{{ $domain->name }}</option>
+                        @foreach($domaines as $k=>$v)
+                            <option value="{{ $k }}">{{ $v }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="mb-3">
-                    <label for="metier_id" class="form-label">Metier</label>
-                    <select name="metier_id" id="metier_id" class="form-control" required>
+                    <label for="metiers" class="form-label">Metier</label>
+                    <select name="metiers[]" id="metiers" class="form-control" required multiple>
                         <option value="">Sélectionnez un metier</option>
                         
-                        @foreach($metiers as $metier)
-                            <option value="{{ $metier->id }}">{{ $metier->name }}</option>
+                        @foreach($metiers as $k=>$v)
+                            <option value="{{ $k }}">{{ $v}}</option>
                         @endforeach
                     </select>
                 </div>
@@ -50,10 +50,15 @@
                     <label for="annees_experience" class="form-label">Année experience</label>
                     <input type="numeric" name="annees_experience" id="annees_experience" class="form-control" value="{{ old('annees_experience') }}">
                 </div>
-                <div class="mb-3">
-                    <label for="entreprises" class="form-label">Entreprise</label>
-                    <input type="text" name="entreprises" id="entreprises" class="form-control" value="{{ old('entreprises') }}">
+                <div class="mb-3" id="entreprises-container">
+                   <label for="entreprises" class="form-label">Nom de l'entreprise</label>
+                    <input type="text" name="entreprises[]" id="entreprises" class="form-control" placeholder="Nom de l'entreprise">
                 </div>
+
+                <button type="button" id="add-entreprise" class="mb-3 btn btn-primary">
+                    Ajouter une entreprise
+                </button>
+
                 <div class="mb-3">
                     <label for="date_of_birth" class="form-label">Date de naissance</label>
                     <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" value="{{ old('date_of_birth') }}" required>
@@ -123,4 +128,37 @@
             Retour
         </a>
     </div>
+
+
+    <script>
+        document.getElementById('add-entreprise').addEventListener('click', function () {
+            const row = document.createElement('div');
+
+            row.innerHTML = `
+                <div class="d-flex mb-2">
+                    <input
+                        type="text"
+                        name="entreprises[]"
+                        class="form-control me-2"
+                        placeholder="Nom de l'entreprise">
+
+                    <button
+                        type="button"
+                        class="btn btn-danger remove-row">
+                        X
+                    </button>
+                </div>
+            `;
+
+            document
+                .getElementById('entreprises-container')
+                .appendChild(row);
+        });
+
+        document.addEventListener('click', function (e) {
+            if (e.target.classList.contains('remove-row')) {
+                e.target.closest('.d-flex').remove();
+            }
+        });
+    </script>
 @endsection

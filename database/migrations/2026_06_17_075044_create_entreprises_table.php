@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ouvrier', function (Blueprint $table) {
-            $table->boolean('diplome')->default(false);
+        Schema::create('entreprises', function (Blueprint $table) {
+            $table->uuid('id')->primary();
+            $table->string('name');
+            $table->timestamps();
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ouvrier', function (Blueprint $table) {
-            $table->dropColumn('diplome');
-        });
+        Schema::dropIfExists('entreprises');
     }
 };

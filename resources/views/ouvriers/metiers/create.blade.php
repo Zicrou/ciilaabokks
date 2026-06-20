@@ -11,8 +11,8 @@
                     <input type="text" name="name" id="name" class="form-control" required>
                 </div>
                 <div class="mb-3">
-                    <label for="domain_id" class="form-label">Domaine</label>
-                    <select name="domain_id" id="domain_id" class="form-control" required>
+                    <label for="domaine_id" class="form-label">Domaine</label>
+                    <select name="domaine_id" id="domaine_id" class="form-control" required>
                         <option value="">Sélectionnez un domaine</option>
                         @foreach($domaines as $domaine)
                             <option value="{{ $domaine->id }}">{{ $domaine->name }}</option>
