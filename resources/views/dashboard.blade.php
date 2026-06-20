@@ -13,6 +13,9 @@
                         <a href="{{ route('ouvriers.create') }}" class="btn btn-primary">Ajouter un ouvrier</a>
                         {{-- <a href="{{ route('ouvriers.show', $numero_de_telephone) }}" class="btn btn-primary">Mon Compte</a> --}}
                         <a href="{{ route('ouvriers.liste') }}" class="btn btn-primary">Voir la liste des Ouvriers</a>
+                        @if (Auth()->user()->role == 'admin')
+                            <a href="{{ route('admin') }}" class="btn btn-primary">Admin</a>
+                        @endif
                         {{-- <div class=""> --}}
                             <form action="{{ route("ouvriers.mon_compte") }}" method="get" style="display: inline;" class="d-flex justify-content-end">
                                 @csrf

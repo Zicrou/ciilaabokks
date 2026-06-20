@@ -6,7 +6,9 @@ use App\Http\Requests\OuvrierFormRequest;
 use App\Http\Requests\OuvrierUpdateFormRequest;
 use App\Models\Entreprise;
 use App\Models\Ouvrier;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class OuvrierController extends Controller
 {
@@ -131,6 +133,7 @@ public function departementsByRegion(Request $request)
             $data['photo'] = $path;
             // dd($data['photo']);
         }
+        $data['user_id'] = Auth::user()->id;
         $ouvrier = \App\Models\Ouvrier::create($data);
         $ouvrier->diplomes()->sync($request->validated('diplomes'));
         $ouvrier->metiers()->sync($request->validated('metiers'));
@@ -139,11 +142,12 @@ public function departementsByRegion(Request $request)
         $entrepriseIds = [];
 
         foreach ($request->entreprises as $name) {
-
-            $entreprise = Entreprise::firstOrCreate([
-                'name' => $name,
-            ]);
-            $entrepriseIds[] = $entreprise->id;
+            if($name != null){
+                $entreprise = Entreprise::firstOrCreate([
+                    'name' => $name,
+                ]);
+                $entrepriseIds[] = $entreprise->id;
+            }
         }
 
         $ouvrier->entreprises()->sync($entrepriseIds);
@@ -186,12 +190,12 @@ public function departementsByRegion(Request $request)
      */
     public function edit(string $id)
     {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['region', 'departement', 'country', 'portfolios']);
+        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['region', 'departement', 'country', 'portfolios', 'entreprises']);
         $selectedDiplomes = $ouvrier->diplomes->pluck('id');
         $selectedmetiers = $ouvrier->metiers->pluck('id');
         $selectedDomaines = $ouvrier->domaines->pluck('id');
         $selectedCountry = $ouvrier->country->pluck('id');
-
+        // dd($ouvrier);
         return view('ouvriers.ouvriers.edit', [
             'ouvrier' => $ouvrier,
             'countries' => \App\Models\Countries::pluck('name', 'id'),
@@ -223,10 +227,12 @@ public function departementsByRegion(Request $request)
         $entrepriseIds = [];
         if($request->entreprises != null){
             foreach ($request->entreprises as $name) {
-                $entreprise = Entreprise::firstOrCreate([
-                    'name' => $name,
-                ]);
-                $entrepriseIds[] = $entreprise->id;
+                if($name != null){
+                    $entreprise = Entreprise::firstOrCreate([
+                        'name' => $name,
+                    ]);
+                    $entrepriseIds[] = $entreprise->id;
+                }
             }
             $ouvrier->entreprises()->sync($entrepriseIds);
         }

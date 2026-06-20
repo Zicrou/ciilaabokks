@@ -27,10 +27,11 @@ Route::prefix('v1')->group(function () {
         Route::get('mon_compte', [\App\Http\Controllers\api\v1\OuvrierController::class,'get_mon_compte'])->name('ouvriers.mon_compte');
         Route::get('/filtered/metiers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'metiersByDomaine']);
         Route::get('/filtered/departements', [\App\Http\Controllers\api\v1\OuvrierController::class, 'departementsByRegion']);
-        Route::resource('ouvriers', \App\Http\Controllers\api\v1\OuvrierController::class);
+        Route::resource('ouvriers', \App\Http\Controllers\api\v1\OuvrierController::class)->except(['index', 'show']);
         Route::resource('diplomes', \App\Http\Controllers\api\v1\DiplomeController::class);
     });
-
+    Route::get('ouvriers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'index'])->name('ouvriers');
+    Route::get('ouvriers/{id}', [\App\Http\Controllers\api\v1\OuvrierController::class, 'show'])->name("ouvrier.show");
     Route::middleware('auth:sanctum')->group(function () {
     
 });

@@ -11,12 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('ouvriers', function (Blueprint $table) {
-            $table->addColumn('uuid', 'user_id')->nullable(false);
-            $table->foreign('user_id')
-            ->references('id')
-            ->on('users')
-            ->onDelete('cascade');
+        Schema::table('users', function (Blueprint $table) {
+            $table->addColumn('string', 'role')->default('user');
         });
     }
 
@@ -25,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('ouvriers', function (Blueprint $table) {
-            $table->dropColumn('user_id');
+        Schema::table('users', function (Blueprint $table) {
+            $table->dropColumn('role');
         });
     }
 };
