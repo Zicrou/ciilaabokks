@@ -9,6 +9,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use App\Models\Countries;
 
 class RegionController extends Controller implements HasMiddleware
 {
@@ -24,7 +25,7 @@ class RegionController extends Controller implements HasMiddleware
     public function index()
     {
         return  [
-            'regions' => \App\Models\Region::with('country')->get()
+            'regions' => Region::with('country')->get()
         ];
     }
 
@@ -34,7 +35,7 @@ class RegionController extends Controller implements HasMiddleware
     public function create()
     {
         return  [
-            'countries' => \App\Models\Country::all()
+            'countries' => Countries::all()
         ];
     }
 
@@ -44,13 +45,13 @@ class RegionController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
+            'name' => ['required','string','max:255'],
+            'country_id' => ['required','exists:countries,id'],
         ]);
 
-        Region::create($request->only('name', 'country_id'));
+        $region = Region::create($request->only('name', 'country_id'));
 
-        return ['message', 'Region created successfully.'];
+        return ['region' => $region, 'message' => 'Region created successfully.'];
     }
 
     /**
@@ -67,7 +68,7 @@ class RegionController extends Controller implements HasMiddleware
     public function edit(string $id)
     {
         $region = Region::findOrFail($id)->load('country');
-        return ['region' => $region, 'countries' => Country::all()];
+        return ['region' => $region, 'countries' => Countries::all()];
     }
 
     /**
@@ -77,13 +78,13 @@ class RegionController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'country_id' => 'required|exists:country,id',
+            'country_id' => 'required|exists:countries,id',
         ]);
 
         $region = Region::findOrFail($id);
         $region->update($request->only('name', 'country_id'));
 
-        return ['success', 'Region updated successfully.'];
+        return ['region' => $region, 'success' => 'Region updated successfully.'];
     }
 
     /**
@@ -94,6 +95,6 @@ class RegionController extends Controller implements HasMiddleware
         $region = Region::findOrFail($id);
         $region->delete();
 
-        return ['success', 'Region deleted successfully.'];
+        return ['success' => 'Region deleted successfully.'];
     }
 }
