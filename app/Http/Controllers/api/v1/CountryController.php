@@ -13,6 +13,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Routing\Controllers\Middleware;
 // use Illuminate\Support\Facades\Gate;
 use Laravel\Sanctum\PersonalAccessToken;
+use \App\Models\Countries;
 class CountryController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -28,7 +29,7 @@ class CountryController extends Controller implements HasMiddleware
     public function index()
     {
         return [
-            'countries' => \App\Models\Country::all()
+            'countries' => Countries::all()
         ];
     }
     
@@ -50,7 +51,7 @@ class CountryController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        \App\Models\Country::create($request->only('name'));
+        Countries::create($request->only('name'));
 
         return ['message' => 'Country created successfully.'];
     }
@@ -68,7 +69,7 @@ class CountryController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $country = \App\Models\Country::findOrFail($id);
+        $country = Countries::findOrFail($id);
         return ['country' => $country];
     }
 
@@ -81,7 +82,7 @@ class CountryController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        $country = \App\Models\Country::findOrFail($id);
+        $country = Countries::findOrFail($id);
         $country->update($request->only('name'));
 
         return ['message' => 'Country updated successfully.'];
@@ -92,7 +93,7 @@ class CountryController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $country = \App\Models\Country::findOrFail($id);
+        $country = Countries::findOrFail($id);
         $country->delete();
 
         return ['message' => 'Country deleted successfully.'];

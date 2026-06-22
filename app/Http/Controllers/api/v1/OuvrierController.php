@@ -8,15 +8,26 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\api\v1\OuvrierFormRequest;
+
+use App\Models\Countries;
+use App\Models\Entreprise;
 use App\Models\Portfolio;
 use PhpParser\Node\Stmt\Foreach_;
+use \App\Models\Region;
+use \App\Models\Departement;
+use \App\Models\Metier;
+use \App\Models\Domaine;
+use \App\Models\Diplome;
+use \App\Models\Ouvrier;
+use App\Http\Requests\api\v1\OuvrierUpdateFormRequest;
 
 class OuvrierController extends Controller  implements HasMiddleware
 {
     public static function middleware()
     {
         return [
-            new Middleware('auth:sanctum')->except(['index', 'show'])
+            new Middleware('auth:sanctum')->except(['index', 'show', 'rechercher'])
         ];
     }
     /**
@@ -24,11 +35,11 @@ class OuvrierController extends Controller  implements HasMiddleware
      */
     public function index()
     {   
-        $departements = \App\Models\Departement::all();
-        $metiers = \App\Models\Metier::all();
-        $regions = \App\Models\Region::all();
-        $domaines = \App\Models\Domaine::all();
-        $ouvriers = \App\Models\Ouvrier::query()
+        $departements = Departement::all();
+        $metiers = Metier::all();
+        $regions = Region::all();
+        $domaines = Domaine::all();
+        $ouvriers = Ouvrier::query()
         ->with([
         'metiers.domaine',
         'region',
@@ -53,29 +64,29 @@ class OuvrierController extends Controller  implements HasMiddleware
     public function create()
     {
         return [
-            'countries' => \App\Models\Countries::all(),
-            'regions' => \App\Models\Region::with('country')->get(),
-            'departements' => \App\Models\Departement::all(),
-            'metiers' => \App\Models\Metier::pluck('name', 'id'),
-            'domaines' => \App\Models\Domaine::pluck('name', 'id'),
-            'diplomes' => \App\Models\Diplome::pluck('name', 'id')
+            'countries' => Countries::all(),
+            'regions' => Region::with('country')->get(),
+            'departements' => Departement::all(),
+            'metiers' => Metier::pluck('name', 'id'),
+            'domaines' => Domaine::pluck('name', 'id'),
+            'diplomes' => Diplome::pluck('name', 'id')
         ];
     }
 
     public function metiersByDomaine(Request $request)
     {
         if ($request->domaine_id == null || $request->domaine_id == ""){
-            return \App\Models\Metier::all();
+            return Metier::all();
         }
-        return \App\Models\Metier::where('domaine_id',$request->domaine_id)->get();
+        return Metier::where('domaine_id',$request->domaine_id)->get();
     }
 
 public function departementsByRegion(Request $request)
     {
         if($request->region_id == null || $request->region_id == ""){
-            return \App\Models\Departement::all();
+            return Departement::all();
         }
-        return \App\Models\Departement::where('region_id',$request->region_id)->get();
+        return Departement::where('region_id',$request->region_id)->get();
     }
     
 
@@ -118,10 +129,10 @@ public function departementsByRegion(Request $request)
         'departement',
         'country',
     ])->get();
-    $metiers = \App\Models\Metier::all();
-    $departements = \App\Models\Departement::all();
-    $regions = \App\Models\Region::all();
-    $domaines = \App\Models\Domaine::all();
+    $metiers = Metier::all();
+    $departements = Departement::all();
+    $regions = Region::all();
+    $domaines = Domaine::all();
 
     return ['ouvriers' => $ouvriers, 'departements' => $departements, 'metiers' => $metiers, 'regions' => $regions, 'domaines' => $domaines];
 }
@@ -141,8 +152,8 @@ public function departementsByRegion(Request $request)
             $data['photo'] = $path;
             // dd($data['photo']);
         }
-        $data['user_id'] = Auth::user()->id;
-        $ouvrier = \App\Models\Ouvrier::create($data);
+        $data['user_id'] = $request->user()->id;
+        $ouvrier = Ouvrier::create($data);
         $ouvrier->diplomes()->sync($request->validated('diplomes'));
         $ouvrier->metiers()->sync($request->validated('metiers'));
         $ouvrier->domaines()->sync($request->validated('domaines'));
@@ -171,7 +182,7 @@ public function departementsByRegion(Request $request)
             if($uploadedImages != null){
                 
                 forEach($uploadedImages as $image){
-                    \App\Models\Portfolio::create([
+                    Portfolio::create([
                         'image' => $image,
                         'ouvrier_id' => $ouvrier->id,
                     ]);
@@ -187,7 +198,7 @@ public function departementsByRegion(Request $request)
      */
     public function show(String $id)
     {
-        $ouvrier = \App\Models\Ouvrier::find($id)->load(['metiers.domaine', 'region', 'departement', 'country', 'portfolios']);
+        $ouvrier = Ouvrier::find($id)->load(['metiers.domaine', 'region', 'departement', 'country', 'portfolios']);
         // dd($ouvrier);        
         
         return $ouvrier;
@@ -198,7 +209,7 @@ public function departementsByRegion(Request $request)
      */
     public function edit(string $id)
     {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id)->load(['region', 'departement', 'country', 'portfolios', 'entreprises']);
+        $ouvrier = Ouvrier::findOrFail($id)->load(['region', 'departement', 'country', 'portfolios', 'entreprises']);
         $selectedDiplomes = $ouvrier->diplomes->pluck('id');
         $selectedmetiers = $ouvrier->metiers->pluck('id');
         $selectedDomaines = $ouvrier->domaines->pluck('id');
@@ -206,12 +217,12 @@ public function departementsByRegion(Request $request)
 
         return [
             'ouvrier' => $ouvrier,
-            'countries' => \App\Models\Countries::pluck('name', 'id'),
-            'regions' => \App\Models\Region::all(),
-            'departements' => \App\Models\Departement::all(),
-            'metiers' => \App\Models\Metier::pluck('name', 'id'),
-            'domaines' => \App\Models\Domaine::pluck('name', 'id'),
-            'diplomes' => \App\Models\Diplome::pluck('name', 'id'),
+            'countries' => Countries::pluck('name', 'id'),
+            'regions' => Region::all(),
+            'departements' => Departement::all(),
+            'metiers' => Metier::pluck('name', 'id'),
+            'domaines' => Domaine::pluck('name', 'id'),
+            'diplomes' => Diplome::pluck('name', 'id'),
             'selectedDiplomes' => $selectedDiplomes,
             'selectedDomaines' => $selectedDomaines,
             'selectedMetiers' => $selectedmetiers,
@@ -226,7 +237,7 @@ public function departementsByRegion(Request $request)
     {
         // dd($request->all());
         $dataOuvrier = $request->validated();
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id);
+        $ouvrier = Ouvrier::findOrFail($id);
         $ouvrier->diplomes()->sync($dataOuvrier['diplomes']);
         $ouvrier->update($request->only('name', 'country_id', 'region_id', 'departement_id', 'date_of_birth', 'phone_number', 'email', 'address', 'phone_number_2', 'numero_cni', 'photo', 'photo_cni','annees_experience', 'user_id'));
         $ouvrier->metiers()->sync($dataOuvrier['metiers']);
@@ -261,7 +272,7 @@ public function departementsByRegion(Request $request)
             if($uploadedImages != null){
                 
                 forEach($uploadedImages as $image){
-                    \App\Models\Portfolio::create([
+                    Portfolio::create([
                         'image' => $image,
                         'ouvrier_id' => $ouvrier->id,
                     ]);
@@ -270,7 +281,9 @@ public function departementsByRegion(Request $request)
         }
         
         
-        return redirect()->route('ouvrier.show', $ouvrier->id)->with('success', 'Ouvrier updated successfully.');
+        return [$ouvrier,
+        'success' => 'Ouvrier updated successfully.'
+        ];
     }
 
 
@@ -288,20 +301,22 @@ public function departementsByRegion(Request $request)
         ]
 
 );
-        $ouvrier = \App\Models\Ouvrier::where('phone_number', $request->telephone)->orWhere('phone_number_2', $request->telephone)->first();
+        $ouvrier = Ouvrier::where('phone_number', $request->telephone)->orWhere('phone_number_2', $request->telephone)->first();
         if($request->telephone){
             return $this->show($ouvrier->id);
         }
-        return view('dashboard', ['message' => "Ce numero est invalide"]);
+        return ['message' => "Ce numero est invalide"];
     }
     /**
      * Remove the specified resource from storage.
      */
     public function destroy(string $id)
     {
-        $ouvrier = \App\Models\Ouvrier::findOrFail($id);
+        $ouvrier = Ouvrier::findOrFail($id);
         $ouvrier->delete();
 
-        return redirect()->route('ouvriers.liste')->with('success', 'Ouvrier deleted successfully.');
+        return ['success', 'Ouvrier deleted successfully.'];
     }
 }
+
+
