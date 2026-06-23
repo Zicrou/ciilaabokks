@@ -7,6 +7,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use \App\Models\Diplome;
 class DiplomeController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -21,7 +22,7 @@ class DiplomeController extends Controller implements HasMiddleware
     public function index()
     {
         return [
-            'diplomes' => \App\Models\Diplome::all()
+            'diplomes' => Diplome::all()
         ];
     }
 
@@ -42,7 +43,7 @@ class DiplomeController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        \App\Models\Diplome::create($request->only('name'));
+        Diplome::create($request->only('name'));
 
         return ['message' => 'Diplome created successfully.'];
     }
@@ -60,7 +61,7 @@ class DiplomeController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $diplomes = \App\Models\Diplome::findOrFail($id);
+        $diplomes = Diplome::findOrFail($id);
         return ['diplomes' => $diplomes];
     }
 
@@ -73,10 +74,10 @@ class DiplomeController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        $diplomes = \App\Models\Diplome::findOrFail($id);
+        $diplomes = Diplome::findOrFail($id);
         $diplomes->update($request->only('name'));
 
-        return ['success', 'Diplome updated successfully.'];
+        return ['success' => 'Diplome updated successfully.'];
     }
 
     /**
@@ -84,9 +85,9 @@ class DiplomeController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $diplomes = \App\Models\Diplome::findOrFail($id);
+        $diplomes = Diplome::findOrFail($id);
         $diplomes->delete();
 
-    return ['success', 'Diplome deleted successfully.'];
+    return ['success' => 'Diplome deleted successfully.'];
     }
 }
