@@ -7,6 +7,9 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use App\Models\Metier;
+use \App\Models\Domaine;
+
 class MetierController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -21,7 +24,7 @@ class MetierController extends Controller implements HasMiddleware
     public function index()
     {
         return [
-            'metiers' => \App\Models\Metier::with('domain')->get()
+            'metiers' => Metier::with('domaine')->get()
         ];
     }
 
@@ -31,7 +34,7 @@ class MetierController extends Controller implements HasMiddleware
     public function create()
     {
         return [
-            'domaines' => \App\Models\Domain::all()
+            'domaines' => Domaine::all()
         ];
     }
 
@@ -42,12 +45,12 @@ class MetierController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'domain_id' => 'required|exists:domain,id',
+            'domaine_id' => 'required|exists:domaines,id',
         ]);
 
-        \App\Models\Metier::create($request->only('name', 'domain_id'));
+        Metier::create($request->only('name', 'domaine_id'));
 
-        return ['message', 'Metier created successfully.'];
+        return ['message' => 'Metier created successfully.'];
     }
 
     /**
@@ -63,8 +66,8 @@ class MetierController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $metier = \App\Models\Metier::findOrFail($id)->load('domain');
-        return ['metier' => $metier, 'domaines' => \App\Models\Domain::all()];
+        $metier = Metier::findOrFail($id)->load('domaine');
+        return ['metier' => $metier, 'domaines' => Domaine::all()];
     }
 
     /**
@@ -74,13 +77,13 @@ class MetierController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'domain_id' => 'required|exists:domain,id',
+            'domaine_id' => 'required|exists:domaines,id',
         ]);
 
-        $metier = \App\Models\Metier::findOrFail($id);
-        $metier->update($request->only('name', 'domain_id'));
+        $metier = Metier::findOrFail($id);
+        $metier->update($request->only('name', 'domaine_id'));
 
-        return ['success', 'Metier updated successfully.'];
+        return ['success' => 'Metier updated successfully.'];
     }
 
     /**
@@ -88,9 +91,9 @@ class MetierController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $metier = \App\Models\Metier::findOrFail($id);
+        $metier = Metier::findOrFail($id);
         $metier->delete();
 
-        return ['success', 'Metier deleted successfully.'];
+        return ['success' => 'Metier deleted successfully.'];
     }
 }
