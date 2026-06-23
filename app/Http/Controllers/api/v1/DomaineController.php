@@ -7,6 +7,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use \App\Models\Domaine;
 class DomaineController extends Controller implements HasMiddleware
 {
     public static function middleware()
@@ -21,7 +22,7 @@ class DomaineController extends Controller implements HasMiddleware
     public function index()
     {
         return [
-            'domaines' => \App\Models\Domain::all()
+            'domaines' => Domaine::all()
         ];
     }
 
@@ -42,7 +43,7 @@ class DomaineController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        \App\Models\Domain::create($request->only('name'));
+        Domaine::create($request->only('name'));
 
         return ['message' => 'Domaine created successfully.'];
     }
@@ -60,7 +61,7 @@ class DomaineController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $domaines = \App\Models\Domain::findOrFail($id);
+        $domaines = Domaine::findOrFail($id);
         return ['domaines' => $domaines];
     }
 
@@ -73,10 +74,10 @@ class DomaineController extends Controller implements HasMiddleware
             'name' => 'required|string|max:255',
         ]);
 
-        $domaine = \App\Models\Domain::findOrFail($id);
+        $domaine = Domaine::findOrFail($id);
         $domaine->update($request->only('name'));
 
-        return ['success', 'Domaine updated successfully.'];
+        return ['success' => 'Domaine updated successfully.'];
     }
 
     /**
@@ -84,9 +85,9 @@ class DomaineController extends Controller implements HasMiddleware
      */
     public function destroy(string $id)
     {
-        $domaine = \App\Models\Domain::findOrFail($id);
+        $domaine = Domaine::findOrFail($id);
         $domaine->delete();
 
-    return ['success', 'Domaine deleted successfully.'];
+    return ['success' => 'Domaine deleted successfully.'];
     }
 }

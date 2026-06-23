@@ -43,7 +43,7 @@ class DepartementController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
+            'region_id' => 'required|exists:regions,id',
         ]);
 
         \App\Models\Departement::create($request->only('name', 'region_id'));
@@ -75,7 +75,7 @@ class DepartementController extends Controller implements HasMiddleware
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'region_id' => 'required|exists:region,id',
+            'region_id' => 'required|exists:regions,id',
         ]);
 
         $departement = \App\Models\Departement::findOrFail($id);
