@@ -12,7 +12,7 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
-
+use App\Models\Ouvrier;
 
 class ProfileController extends Controller implements HasMiddleware
 {
@@ -24,7 +24,25 @@ class ProfileController extends Controller implements HasMiddleware
     }
 
     public function index(Request $request){
-        return ['user' => $request->user()];
+        $user = $request->user();
+        if(!$user){
+            return "User not found";
+        }
+        $ouvrier = Ouvrier::where('user_id', $user->id)
+        ->with([
+        'metiers.domaine',
+        'region',
+        'departement',
+        'country',
+        'entreprises',
+        'portfolios'
+    ])->first();
+        $portfolios = "";
+        return [
+            'user' => $request->user(),
+            'ouvrier_info' => $ouvrier,
+            // 'portfolios' => $portfolios
+        ];
     }
     /**
      * Display the user's profile form.
@@ -45,9 +63,7 @@ class ProfileController extends Controller implements HasMiddleware
         if ($request->user()->isDirty('email')) {
             $request->user()->email_verified_at = null;
         }
-
         $request->user()->save();
-
         return ['status', 'profile-updated'];
     }
 
@@ -62,7 +78,7 @@ class ProfileController extends Controller implements HasMiddleware
 
         $user = $request->user();
 
-        Auth::logout();
+        // Log out the user
 
         $user->delete();
 

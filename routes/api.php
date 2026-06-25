@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+$id = '[0-9a-zA-Z]+';
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -13,6 +14,8 @@ Route::prefix('v1')->group(function () {
         return $request->user();
     })->middleware('auth:sanctum');
     Route::get('ouvrier/rechercher', [\App\Http\Controllers\api\v1\OuvrierController::class, 'rechercher'])->name('rechercher_ouvrier');
+    Route::get('portfolios/ouvrier/{id}', [\App\Http\Controllers\api\v1\PortfolioController::class, 'index'])->name('portfolios.index');
+    Route::post('portfolios/ouvrier', [\App\Http\Controllers\api\v1\PortfolioController::class, 'store'])->name('portfolios.store');
 
     Route::post('/register', [\App\Http\Controllers\api\v1\AuthController::class, 'register']);
     Route::post('/login', [\App\Http\Controllers\api\v1\AuthController::class, 'login']);
@@ -30,6 +33,8 @@ Route::prefix('v1')->group(function () {
         Route::get('/filtered/departements', [\App\Http\Controllers\api\v1\OuvrierController::class, 'departementsByRegion']);
         Route::resource('ouvriers', \App\Http\Controllers\api\v1\OuvrierController::class)->except(['index', 'show', 'rechercher']);
         Route::resource('diplomes', \App\Http\Controllers\api\v1\DiplomeController::class);
+        Route::delete('portfolios/ouvrier/{id}', [\App\Http\Controllers\api\v1\PortfolioController::class, 'destroy'])->name('portfolios.delete');
+        Route::resource('ouvriers/profile', \App\Http\Controllers\api\v1\ProfileController::class);
     });
     Route::get('ouvriers', [\App\Http\Controllers\api\v1\OuvrierController::class, 'index'])->name('ouvriers');
     Route::get('ouvriers/{id}', [\App\Http\Controllers\api\v1\OuvrierController::class, 'show'])->name("ouvrier.show");

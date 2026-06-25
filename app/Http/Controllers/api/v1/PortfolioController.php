@@ -9,22 +9,26 @@ use Laravel\Sanctum\PersonalAccessToken;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use App\Http\Controllers\Controller;
+use App\Models\Ouvrier;
+use \App\Models\Portfolio;
 
 class PortfolioController extends Controller implements HasMiddleware
 {
     public static function middleware()
     {
         return [
-            new Middleware('auth:sanctum'),
+            new Middleware('auth:sanctum')->except(['index' ,'show']),
         ];
     }
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $ouvrier = Ouvrier::findOrFail($request->id)->with('portfolios')->get();
+        
         return  [
-            'portfolios' => \App\Models\Portfolio::with('ouvrier')->get()
+            'portfolios' => Portfolio::with('ouvrier')->get()
         ];
     }
 
@@ -34,7 +38,7 @@ class PortfolioController extends Controller implements HasMiddleware
     public function create()
     {
         return  [
-            'portfolios' => \App\Models\Portfolio::all()
+            'portfolios' => Portfolio::all()
         ];
     }
 
@@ -44,25 +48,30 @@ class PortfolioController extends Controller implements HasMiddleware
     public function store(Request $request)
     {
         $request->validate([
-            'ouvrier_id' => 'required|exists:ouvrier,id',
-            'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
+        'ouvrier_id' => 'required|exists:ouvriers,id',
+        'images' => ['required', 'array'],
+        'images.*' => [
+            'required',
+            'string',
+            'regex:/\.(jpg|jpeg|png|webp)$/i',
+            ],
         ]);
-
         $portfolio = "";
         
-         $uploadedImages = [];
+        $uploadedImages = [];
+        
+        foreach ($request->input('images') as $image) {
+        //     // dd($image);
 
-        foreach ($request->file('images') as $image) {
+            // $path = $image->store('portfolios', 'public');
 
-            $path = $image->store('portfolios', 'public');
-
-            $uploadedImages[] = $path;
+            $uploadedImages[] = $image;
 
         }
         if($uploadedImages != null){
             
             forEach($uploadedImages as $image){
-                $portfolio = \App\Models\Portfolio::create([
+                $portfolio = Portfolio::create([
                     'image' => $image,
                     'ouvrier_id' => $request->ouvrier_id,
                 ]);
@@ -85,7 +94,7 @@ class PortfolioController extends Controller implements HasMiddleware
      */
     public function edit(string $id)
     {
-        $portfolio = \App\Models\Portfolio::findOrFail($id)->load('ouvrier');
+        $portfolio = Portfolio::findOrFail($id)->load('ouvrier');
         return ['portfolio' => $portfolio];
     }
 
@@ -99,11 +108,11 @@ class PortfolioController extends Controller implements HasMiddleware
             'images.*' => ['nullable','image','mimes:jpeg,png,jpg,gif,webp','max:2048']
         ]);
 
-        $portfolio = \App\Models\Portfolio::findOrFail($id);
+        $portfolio = Portfolio::findOrFail($id);
         if($request->images != null){
             $images = $request->images;
             forEach($images as $image){
-                \App\Models\Portfolio::create([
+                Portfolio::create([
                     'image' => $image,
                     'ouvrier_id' => $request->ouvrier_id,
                 ]);
@@ -116,11 +125,19 @@ class PortfolioController extends Controller implements HasMiddleware
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
-    {
-        $portfolio = \App\Models\Portfolio::findOrFail($id);
-        $portfolio->delete();
+    public function destroy(Request $request, string $id)
+    {   
+        $user = $request->user();
+        if(!$user){
+            return "user not found";
+        }
+        if($id != ""){
+            $ouvrier = Ouvrier::where('user_id', $user->id)->firstOrFail();
+            $portfolio = Portfolio::where('id', $id)->where('ouvrier_id', $ouvrier->id)->firstOrFail();
+            $portfolio->delete();
+            return ['message' => 'Portfolio deleted successfully.'];
+        }
 
-        return ['message' => 'Region deleted successfully.'];
+        return ["message" => 'ouvrier id not found'];
     }
 }
