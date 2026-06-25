@@ -149,7 +149,7 @@
         </div>
     </div>
     <div class="mt-4">
-        <a href="{{ route('ouvriers.index') }}" class="btn btn-secondary">
+        <a href="{{ route('ouvriers.liste') }}" class="btn btn-secondary">
             Retour
         </a>
     </div>

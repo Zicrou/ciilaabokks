@@ -93,7 +93,7 @@ public function departementsByRegion(Request $request)
   public function rechercher(Request $request)
 {
     $query = Ouvrier::query();
-
+    
     if ($request->filled('domaine_id')) {
         $query->whereHas('domaines', function ($q) use ($request) {
             $q->where('domaines.id', $request->domaine_id);
@@ -123,7 +123,6 @@ public function departementsByRegion(Request $request)
     }
 
     $ouvriers = $query->with([
-        'domaines',
         'metiers.domaine',
         'region',
         'departement',
